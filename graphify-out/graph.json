@@ -1,0 +1,2971 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "theming_flow",
+        "label": "Dynamic Theming System",
+        "nodes": [
+          "services_wallpaperservice",
+          "commons_colors",
+          "commons_ordercolors",
+          "services_themesync"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95
+      },
+      {
+        "id": "notification_system",
+        "label": "Notification Pipeline",
+        "nodes": [
+          "services_notificationservice",
+          "modules_bar",
+          "widgets_bar_notificationlist"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.9
+      },
+      {
+        "id": "media_visualization",
+        "label": "Media & Audio Visualization",
+        "nodes": [
+          "services_spotifyinfo",
+          "services_cavaservice",
+          "modules_bar"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.85
+      },
+      {
+        "id": "equalizer_system",
+        "label": "Equalizer System",
+        "nodes": [
+          "widgets_equalizer_eqcontrolscard",
+          "widgets_equalizer_eqlightningcanvas",
+          "widgets_equalizer_equalizerbackend",
+          "eq_parametric_eq"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "ui_components_general",
+        "label": "General UI Components",
+        "nodes": [
+          "widgets_general_panel",
+          "widgets_general_panelpopup",
+          "widgets_general_hoverpopup",
+          "widgets_general_mediabutton"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.9
+      },
+      {
+        "id": "bar_layout_components",
+        "label": "Bar Layout Components",
+        "nodes": [
+          "widgets_bar_leftside",
+          "widgets_bar_midside",
+          "widgets_bar_rightside"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0
+      },
+      {
+        "id": "popup_trigger_pattern",
+        "label": "Popup Trigger Pattern",
+        "nodes": [
+          "widgets_bar_archwallpaperbutton",
+          "widgets_bar_bleactivate",
+          "widgets_bar_eqactivate",
+          "widgets_bar_notificationbell",
+          "widgets_bar_poweroff",
+          "widgets_bar_red",
+          "widgets_bar_spotify"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.9
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "main.rs",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Rust/cpu/src/main.rs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "widgets_bar_rust_cpu_src_main",
+      "community": 13,
+      "norm_label": "main.rs"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Rust/cpu/src/main.rs",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "widgets_bar_rust_cpu_src_main_main",
+      "community": 13,
+      "norm_label": "main()"
+    },
+    {
+      "label": "eq_filter_chain.sh",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain",
+      "community": 2,
+      "norm_label": "eq_filter_chain.sh"
+    },
+    {
+      "label": "eq_filter_chain.sh script",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_sh__entry",
+      "community": 7,
+      "norm_label": "eq_filter_chain.sh script"
+    },
+    {
+      "label": "need_cmd()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L18",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_need_cmd",
+      "community": 7,
+      "norm_label": "need_cmd()"
+    },
+    {
+      "label": "check_deps()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L25",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_check_deps",
+      "community": 7,
+      "norm_label": "check_deps()"
+    },
+    {
+      "label": "read_state()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L32",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_read_state",
+      "community": 7,
+      "norm_label": "read_state()"
+    },
+    {
+      "label": "write_state()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L39",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_write_state",
+      "community": 6,
+      "norm_label": "write_state()"
+    },
+    {
+      "label": "default_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L48",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_default_sink",
+      "community": 2,
+      "norm_label": "default_sink()"
+    },
+    {
+      "label": "default_source()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L52",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_default_source",
+      "community": 2,
+      "norm_label": "default_source()"
+    },
+    {
+      "label": "node_id_by_name()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L56",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_node_id_by_name",
+      "community": 2,
+      "norm_label": "node_id_by_name()"
+    },
+    {
+      "label": "set_default_sink_compat()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L70",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_set_default_sink_compat",
+      "community": 6,
+      "norm_label": "set_default_sink_compat()"
+    },
+    {
+      "label": "set_default_source_compat()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L83",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_set_default_source_compat",
+      "community": 6,
+      "norm_label": "set_default_source_compat()"
+    },
+    {
+      "label": "move_sink_inputs_to()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L96",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_move_sink_inputs_to",
+      "community": 9,
+      "norm_label": "move_sink_inputs_to()"
+    },
+    {
+      "label": "capture_eq_sink_state()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L106",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "community": 1,
+      "norm_label": "capture_eq_sink_state()"
+    },
+    {
+      "label": "normalize_eq_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L116",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_normalize_eq_sink",
+      "community": 1,
+      "norm_label": "normalize_eq_sink()"
+    },
+    {
+      "label": "relink_eq_output_to_base_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L123",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_relink_eq_output_to_base_sink",
+      "community": 9,
+      "norm_label": "relink_eq_output_to_base_sink()"
+    },
+    {
+      "label": "first_real_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L148",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_first_real_sink",
+      "community": 2,
+      "norm_label": "first_real_sink()"
+    },
+    {
+      "label": "running_real_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L152",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_running_real_sink",
+      "community": 2,
+      "norm_label": "running_real_sink()"
+    },
+    {
+      "label": "sink_exists()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L156",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_sink_exists",
+      "community": 1,
+      "norm_label": "sink_exists()"
+    },
+    {
+      "label": "is_virtual_eq_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L161",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_is_virtual_eq_sink",
+      "community": 1,
+      "norm_label": "is_virtual_eq_sink()"
+    },
+    {
+      "label": "source_exists()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L165",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_source_exists",
+      "community": 10,
+      "norm_label": "source_exists()"
+    },
+    {
+      "label": "first_real_source()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L170",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_first_real_source",
+      "community": 10,
+      "norm_label": "first_real_source()"
+    },
+    {
+      "label": "running_real_source()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L174",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_running_real_source",
+      "community": 2,
+      "norm_label": "running_real_source()"
+    },
+    {
+      "label": "pick_best_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L178",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_pick_best_sink",
+      "community": 2,
+      "norm_label": "pick_best_sink()"
+    },
+    {
+      "label": "pick_best_source()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L198",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_pick_best_source",
+      "community": 10,
+      "norm_label": "pick_best_source()"
+    },
+    {
+      "label": "ensure_gains()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L218",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_ensure_gains",
+      "community": 2,
+      "norm_label": "ensure_gains()"
+    },
+    {
+      "label": "write_eq_file()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L235",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_write_eq_file",
+      "community": 1,
+      "norm_label": "write_eq_file()"
+    },
+    {
+      "label": "write_pipewire_conf()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L246",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_write_pipewire_conf",
+      "community": 1,
+      "norm_label": "write_pipewire_conf()"
+    },
+    {
+      "label": "restart_audio_stack()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L273",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_restart_audio_stack",
+      "community": 6,
+      "norm_label": "restart_audio_stack()"
+    },
+    {
+      "label": "wait_for_eq_nodes()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L284",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "community": 1,
+      "norm_label": "wait_for_eq_nodes()"
+    },
+    {
+      "label": "wait_for_sink()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L295",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_wait_for_sink",
+      "community": 1,
+      "norm_label": "wait_for_sink()"
+    },
+    {
+      "label": "wait_for_source()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L308",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_wait_for_source",
+      "community": 10,
+      "norm_label": "wait_for_source()"
+    },
+    {
+      "label": "stabilize_eq_route()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L321",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_stabilize_eq_route",
+      "community": 9,
+      "norm_label": "stabilize_eq_route()"
+    },
+    {
+      "label": "finalize_eq_route()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L333",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_finalize_eq_route",
+      "community": 9,
+      "norm_label": "finalize_eq_route()"
+    },
+    {
+      "label": "recover_eq()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L346",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_recover_eq",
+      "community": 6,
+      "norm_label": "recover_eq()"
+    },
+    {
+      "label": "apply_eq()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L364",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_apply_eq",
+      "community": 1,
+      "norm_label": "apply_eq()"
+    },
+    {
+      "label": "switch_eq_target()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L409",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_switch_eq_target",
+      "community": 1,
+      "norm_label": "switch_eq_target()"
+    },
+    {
+      "label": "disable_eq()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L448",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_disable_eq",
+      "community": 6,
+      "norm_label": "disable_eq()"
+    },
+    {
+      "label": "status_eq()",
+      "file_type": "code",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L475",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "id": "scripts_eq_filter_chain_status_eq",
+      "community": 7,
+      "norm_label": "status_eq()"
+    },
+    {
+      "label": "lock-listener.sh",
+      "file_type": "code",
+      "source_file": "scripts/lock-listener.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "id": "scripts_lock_listener",
+      "community": 12,
+      "norm_label": "lock-listener.sh"
+    },
+    {
+      "label": "lock-listener.sh script",
+      "file_type": "code",
+      "source_file": "scripts/lock-listener.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "id": "scripts_lock_listener_sh__entry",
+      "community": 12,
+      "norm_label": "lock-listener.sh script"
+    },
+    {
+      "label": "Lock Screen Root",
+      "file_type": "code",
+      "source_file": "Lock.qml",
+      "id": "lock_root",
+      "community": 5,
+      "norm_label": "lock screen root"
+    },
+    {
+      "label": "Shell Root",
+      "file_type": "code",
+      "source_file": "shell.qml",
+      "id": "shell_root",
+      "community": 5,
+      "norm_label": "shell root"
+    },
+    {
+      "label": "Colors Singleton",
+      "file_type": "code",
+      "source_file": "Commons/Colors.qml",
+      "id": "commons_colors",
+      "community": 5,
+      "norm_label": "colors singleton"
+    },
+    {
+      "label": "OrderColors Singleton",
+      "file_type": "code",
+      "source_file": "Commons/OrderColors.qml",
+      "id": "commons_ordercolors",
+      "community": 5,
+      "norm_label": "ordercolors singleton"
+    },
+    {
+      "label": "ThemeIcons Singleton",
+      "file_type": "code",
+      "source_file": "Commons/ThemeIcons.qml",
+      "id": "commons_themeicons",
+      "community": 16,
+      "norm_label": "themeicons singleton"
+    },
+    {
+      "label": "WallpaperService",
+      "file_type": "code",
+      "source_file": "Services/WallpaperService.qml",
+      "id": "services_wallpaperservice",
+      "community": 5,
+      "norm_label": "wallpaperservice"
+    },
+    {
+      "label": "NotificationService",
+      "file_type": "code",
+      "source_file": "Services/NotificationService.qml",
+      "id": "services_notificationservice",
+      "community": 0,
+      "norm_label": "notificationservice"
+    },
+    {
+      "label": "SpotifyInfo",
+      "file_type": "code",
+      "source_file": "Services/SpotifyInfo.qml",
+      "verification": "unverified",
+      "id": "services_spotifyinfo",
+      "community": 0,
+      "norm_label": "spotifyinfo"
+    },
+    {
+      "label": "PopupState",
+      "file_type": "code",
+      "source_file": "Services/PopupState.qml",
+      "verification": "unverified",
+      "id": "services_popupstate",
+      "community": 0,
+      "norm_label": "popupstate"
+    },
+    {
+      "label": "ThemeSync",
+      "file_type": "code",
+      "source_file": "Services/ThemeSync.qml",
+      "id": "services_themesync",
+      "community": 5,
+      "norm_label": "themesync"
+    },
+    {
+      "label": "Bar Module",
+      "file_type": "code",
+      "source_file": "Modules/Bar.qml",
+      "id": "modules_bar",
+      "community": 0,
+      "norm_label": "bar module"
+    },
+    {
+      "label": "WallpaperGrid",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/WallpaperGrid.qml",
+      "id": "widgets_bar_wallpapergrid",
+      "community": 5,
+      "norm_label": "wallpapergrid"
+    },
+    {
+      "label": "NotificationList",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/NotificationList.qml",
+      "id": "widgets_bar_notificationlist",
+      "community": 0,
+      "norm_label": "notificationlist"
+    },
+    {
+      "label": "CavaService",
+      "file_type": "code",
+      "source_file": "Services/CavaService.qml",
+      "verification": "unverified",
+      "id": "services_cavaservice",
+      "community": 11,
+      "norm_label": "cavaservice"
+    },
+    {
+      "label": "CpuService",
+      "file_type": "code",
+      "source_file": "Services/CpuService.qml",
+      "id": "services_cpuservice",
+      "community": 3,
+      "norm_label": "cpuservice"
+    },
+    {
+      "label": "NetworkStats",
+      "file_type": "code",
+      "source_file": "Services/NetworkStats.qml",
+      "verification": "unverified",
+      "id": "services_networkstats",
+      "community": 4,
+      "norm_label": "networkstats"
+    },
+    {
+      "label": "WifiService",
+      "file_type": "code",
+      "source_file": "Services/WifiService.qml",
+      "id": "services_wifiservice",
+      "community": 4,
+      "norm_label": "wifiservice"
+    },
+    {
+      "label": "EqControlsCard",
+      "file_type": "code",
+      "source_file": "Widgets/Equalizer/EqControlsCard.qml",
+      "verification": "unverified",
+      "id": "widgets_equalizer_eqcontrolscard",
+      "community": 8,
+      "norm_label": "eqcontrolscard"
+    },
+    {
+      "label": "EqLightningCanvas",
+      "file_type": "code",
+      "source_file": "Widgets/Equalizer/EqLightningCanvas.qml",
+      "verification": "unverified",
+      "id": "widgets_equalizer_eqlightningcanvas",
+      "community": 8,
+      "norm_label": "eqlightningcanvas"
+    },
+    {
+      "label": "EqualizerBackend",
+      "file_type": "code",
+      "source_file": "Widgets/Equalizer/EqualizerBackend.qml",
+      "id": "widgets_equalizer_equalizerbackend",
+      "community": 8,
+      "norm_label": "equalizerbackend"
+    },
+    {
+      "label": "AlbumArt",
+      "file_type": "code",
+      "source_file": "Widgets/General/AlbumArt.qml",
+      "id": "widgets_general_albumart",
+      "community": 20,
+      "norm_label": "albumart"
+    },
+    {
+      "label": "DirectorySearchBar",
+      "file_type": "code",
+      "source_file": "Widgets/General/DirectorySearchBar.qml",
+      "id": "widgets_general_directorysearchbar",
+      "community": 21,
+      "norm_label": "directorysearchbar"
+    },
+    {
+      "label": "HoverPopup",
+      "file_type": "code",
+      "source_file": "Widgets/General/HoverPopup.qml",
+      "id": "widgets_general_hoverpopup",
+      "community": 3,
+      "norm_label": "hoverpopup"
+    },
+    {
+      "label": "MediaButton",
+      "file_type": "code",
+      "source_file": "Widgets/General/MediaButton.qml",
+      "id": "widgets_general_mediabutton",
+      "community": 22,
+      "norm_label": "mediabutton"
+    },
+    {
+      "label": "PanelBackground",
+      "file_type": "code",
+      "source_file": "Widgets/General/Panel.qml",
+      "id": "widgets_general_panel",
+      "community": 3,
+      "norm_label": "panelbackground"
+    },
+    {
+      "label": "PanelPopup",
+      "file_type": "code",
+      "source_file": "Widgets/General/PanelPopup.qml",
+      "id": "widgets_general_panelpopup",
+      "community": 3,
+      "norm_label": "panelpopup"
+    },
+    {
+      "label": "Parametric EQ State",
+      "file_type": "document",
+      "source_file": "eq/parametric-eq.txt",
+      "id": "eq_parametric_eq",
+      "community": 8,
+      "norm_label": "parametric eq state"
+    },
+    {
+      "label": "DankCircularImage",
+      "file_type": "code",
+      "source_file": "Commons/DankCircularImage.qml",
+      "verification": "unverified",
+      "id": "commons_dankcircularimage",
+      "community": 14,
+      "norm_label": "dankcircularimage"
+    },
+    {
+      "label": "FuzzySort",
+      "file_type": "code",
+      "source_file": "Commons/FuzzySort.qml",
+      "verification": "unverified",
+      "id": "commons_fuzzysort",
+      "community": 15,
+      "norm_label": "fuzzysort"
+    },
+    {
+      "label": "Ref",
+      "file_type": "code",
+      "source_file": "Commons/Ref.qml",
+      "id": "commons_ref",
+      "community": 11,
+      "norm_label": "ref"
+    },
+    {
+      "label": "ClockWidget",
+      "file_type": "code",
+      "source_file": "Modules/ClockWidget.qml",
+      "verification": "unverified",
+      "id": "modules_clockwidget",
+      "community": 17,
+      "norm_label": "clockwidget"
+    },
+    {
+      "label": "Equalizer",
+      "file_type": "code",
+      "source_file": "Modules/Equalizer.qml",
+      "id": "modules_equalizer",
+      "community": 0,
+      "norm_label": "equalizer"
+    },
+    {
+      "label": "NotificationToast",
+      "file_type": "code",
+      "source_file": "Modules/NotificationToast.qml",
+      "id": "modules_notificationtoast",
+      "community": 0,
+      "norm_label": "notificationtoast"
+    },
+    {
+      "label": "EqBootstrap",
+      "file_type": "code",
+      "source_file": "Services/EqBootstrap.qml",
+      "id": "services_eqbootstrap",
+      "community": 18,
+      "norm_label": "eqbootstrap"
+    },
+    {
+      "label": "ArchWallpaperButton",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/ArchWallpaperButton.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_archwallpaperbutton",
+      "community": 0,
+      "norm_label": "archwallpaperbutton"
+    },
+    {
+      "label": "AudioVisualization",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/AudioVisualization.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_audiovisualization",
+      "community": 11,
+      "norm_label": "audiovisualization"
+    },
+    {
+      "label": "BarClock",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BarClock.qml",
+      "id": "widgets_bar_barclock",
+      "community": 0,
+      "norm_label": "barclock"
+    },
+    {
+      "label": "BarPill",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BarPill.qml",
+      "id": "widgets_bar_barpill",
+      "community": 0,
+      "norm_label": "barpill"
+    },
+    {
+      "label": "Battery",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Battery.qml",
+      "id": "widgets_bar_battery",
+      "community": 3,
+      "norm_label": "battery"
+    },
+    {
+      "label": "BleActivate",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BleActivate.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_bleactivate",
+      "community": 3,
+      "norm_label": "bleactivate"
+    },
+    {
+      "label": "BluetoothActionButton",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BluetoothActionButton.qml",
+      "id": "widgets_bar_bluetoothactionbutton",
+      "community": 4,
+      "norm_label": "bluetoothactionbutton"
+    },
+    {
+      "label": "BluetoothDeviceList",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BluetoothDeviceList.qml",
+      "id": "widgets_bar_bluetoothdevicelist",
+      "community": 4,
+      "norm_label": "bluetoothdevicelist"
+    },
+    {
+      "label": "BluetoothDeviceRow",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/BluetoothDeviceRow.qml",
+      "id": "widgets_bar_bluetoothdevicerow",
+      "community": 4,
+      "norm_label": "bluetoothdevicerow"
+    },
+    {
+      "label": "Cpu",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Cpu.qml",
+      "id": "widgets_bar_cpu",
+      "community": 3,
+      "norm_label": "cpu"
+    },
+    {
+      "label": "EqActivate",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/EqActivate.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_eqactivate",
+      "community": 0,
+      "norm_label": "eqactivate"
+    },
+    {
+      "label": "LeftSide",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "id": "widgets_bar_leftside",
+      "community": 3,
+      "norm_label": "leftside"
+    },
+    {
+      "label": "MidSide",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/MidSide.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_midside",
+      "community": 0,
+      "norm_label": "midside"
+    },
+    {
+      "label": "NotificationBell",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/NotificationBell.qml",
+      "id": "widgets_bar_notificationbell",
+      "community": 0,
+      "norm_label": "notificationbell"
+    },
+    {
+      "label": "Pipewire",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Pipewire.qml",
+      "id": "widgets_bar_pipewire",
+      "community": 3,
+      "norm_label": "pipewire"
+    },
+    {
+      "label": "PowerMenu",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/PowerMenu.qml",
+      "id": "widgets_bar_powermenu",
+      "community": 0,
+      "norm_label": "powermenu"
+    },
+    {
+      "label": "PowerOff",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/PowerOff.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_poweroff",
+      "community": 0,
+      "norm_label": "poweroff"
+    },
+    {
+      "label": "Red",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Red.qml",
+      "id": "widgets_bar_red",
+      "community": 4,
+      "norm_label": "red"
+    },
+    {
+      "label": "RightSide",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_rightside",
+      "community": 0,
+      "norm_label": "rightside"
+    },
+    {
+      "label": "Spoti",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Spoti.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_spoti",
+      "community": 0,
+      "norm_label": "spoti"
+    },
+    {
+      "label": "Spotify",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/Spotify.qml",
+      "id": "widgets_bar_spotify",
+      "community": 0,
+      "norm_label": "spotify"
+    },
+    {
+      "label": "SpotifyAll",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/SpotifyAll.qml",
+      "verification": "unverified",
+      "id": "widgets_bar_spotifyall",
+      "community": 0,
+      "norm_label": "spotifyall"
+    },
+    {
+      "label": "WallpaperThumbnail",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/WallpaperThumbnail.qml",
+      "id": "widgets_bar_wallpaperthumbnail",
+      "community": 19,
+      "norm_label": "wallpaperthumbnail"
+    },
+    {
+      "label": "WifiNetworkList",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/WifiNetworkList.qml",
+      "id": "widgets_bar_wifinetworklist",
+      "community": 4,
+      "norm_label": "wifinetworklist"
+    },
+    {
+      "label": "WifiNetworkRow",
+      "file_type": "code",
+      "source_file": "Widgets/Bar/WifiNetworkRow.qml",
+      "id": "widgets_bar_wifinetworkrow",
+      "community": 4,
+      "norm_label": "wifinetworkrow"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Widgets/Bar/Rust/cpu/src/main.rs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "widgets_bar_rust_cpu_src_main",
+      "target": "widgets_bar_rust_cpu_src_main_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L364",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_apply_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_check_deps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_default_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_default_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L448",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_disable_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L218",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_ensure_gains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L333",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_finalize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_first_real_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L170",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_first_real_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L161",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_is_virtual_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L96",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_move_sink_inputs_to",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_need_cmd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_node_id_by_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L116",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_normalize_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L178",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_pick_best_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_pick_best_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L346",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_recover_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L123",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_relink_eq_output_to_base_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L273",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_restart_audio_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L152",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_running_real_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L174",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_running_real_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_set_default_source_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L156",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L165",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_source_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L321",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_stabilize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L475",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_status_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L409",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_switch_eq_target",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L284",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L295",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_wait_for_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L308",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_wait_for_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L235",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_write_eq_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L246",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_write_pipewire_conf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain",
+      "target": "scripts_eq_filter_chain_write_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L500",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_apply_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L490",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_check_deps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L506",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_disable_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L509",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_recover_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L512",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_status_eq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L503",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_sh__entry",
+      "target": "scripts_eq_filter_chain_switch_eq_target",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L28",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_check_deps",
+      "target": "scripts_eq_filter_chain_need_cmd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L369",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L449",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L347",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L476",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_status_eq",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L412",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_read_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L393",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_write_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L451",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_write_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L349",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_write_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L429",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_write_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L286",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "target": "scripts_eq_filter_chain_node_id_by_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L402",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L460",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L340",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_finalize_eq_route",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L359",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L436",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_set_default_sink_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L403",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_set_default_source_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L469",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_set_default_source_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L360",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_set_default_source_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L437",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_set_default_source_compat",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L341",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_finalize_eq_route",
+      "target": "scripts_eq_filter_chain_move_sink_inputs_to",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L328",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_stabilize_eq_route",
+      "target": "scripts_eq_filter_chain_move_sink_inputs_to",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L370",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L107",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L450",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L348",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L413",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_capture_eq_sink_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L401",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_normalize_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L117",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_normalize_eq_sink",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L358",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_normalize_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L435",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_normalize_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L339",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_finalize_eq_route",
+      "target": "scripts_eq_filter_chain_relink_eq_output_to_base_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L327",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_stabilize_eq_route",
+      "target": "scripts_eq_filter_chain_relink_eq_output_to_base_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L195",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_pick_best_sink",
+      "target": "scripts_eq_filter_chain_first_real_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L379",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L182",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_pick_best_sink",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L423",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L286",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L299",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_wait_for_sink",
+      "target": "scripts_eq_filter_chain_sink_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L376",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_is_virtual_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L419",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_is_virtual_eq_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L202",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_pick_best_source",
+      "target": "scripts_eq_filter_chain_source_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L312",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_wait_for_source",
+      "target": "scripts_eq_filter_chain_source_exists",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L215",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_pick_best_source",
+      "target": "scripts_eq_filter_chain_first_real_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L391",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_write_eq_file",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L392",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_write_pipewire_conf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L395",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_restart_audio_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L454",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_disable_eq",
+      "target": "scripts_eq_filter_chain_restart_audio_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L396",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L356",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L432",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_wait_for_eq_nodes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L397",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_wait_for_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L433",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_wait_for_sink",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L398",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_wait_for_source",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L400",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_stabilize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L357",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_recover_eq",
+      "target": "scripts_eq_filter_chain_stabilize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L434",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_stabilize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L404",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_apply_eq",
+      "target": "scripts_eq_filter_chain_finalize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/eq_filter_chain.sh",
+      "source_location": "L438",
+      "weight": 1.0,
+      "context": "call",
+      "_origin": "ast",
+      "source": "scripts_eq_filter_chain_switch_eq_target",
+      "target": "scripts_eq_filter_chain_finalize_eq_route",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/lock-listener.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_lock_listener",
+      "target": "scripts_lock_listener_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Lock.qml",
+      "source": "lock_root",
+      "target": "commons_colors"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Lock.qml",
+      "source": "lock_root",
+      "target": "services_wallpaperservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shell.qml",
+      "source": "shell_root",
+      "target": "commons_colors"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shell.qml",
+      "source": "shell_root",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shell.qml",
+      "source": "shell_root",
+      "target": "services_themesync"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Commons/Colors.qml",
+      "source": "commons_colors",
+      "target": "commons_ordercolors"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Services/ThemeSync.qml",
+      "source": "services_themesync",
+      "target": "commons_colors"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Services/SpotifyInfo.qml",
+      "source": "services_spotifyinfo",
+      "target": "commons_ordercolors"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Services/WallpaperService.qml",
+      "source": "services_wallpaperservice",
+      "target": "commons_ordercolors"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Commons/ThemeIcons.qml",
+      "source": "commons_themeicons",
+      "target": "commons_themeicons"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/WallpaperGrid.qml",
+      "source": "widgets_bar_wallpapergrid",
+      "target": "services_wallpaperservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Modules/Bar.qml",
+      "source": "modules_bar",
+      "target": "services_notificationservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Modules/NotificationToast.qml",
+      "source": "modules_notificationtoast",
+      "target": "services_notificationservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/NotificationBell.qml",
+      "source": "widgets_bar_notificationbell",
+      "target": "services_notificationservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/NotificationList.qml",
+      "source": "widgets_bar_notificationlist",
+      "target": "services_notificationservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Spotify.qml",
+      "source": "widgets_bar_spotify",
+      "target": "services_spotifyinfo"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/SpotifyAll.qml",
+      "source": "widgets_bar_spotifyall",
+      "target": "services_spotifyinfo"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Modules/Bar.qml",
+      "source": "modules_bar",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Modules/Equalizer.qml",
+      "source": "modules_equalizer",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/ArchWallpaperButton.qml",
+      "source": "widgets_bar_archwallpaperbutton",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/BleActivate.qml",
+      "source": "widgets_bar_bleactivate",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/EqActivate.qml",
+      "source": "widgets_bar_eqactivate",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/NotificationBell.qml",
+      "source": "widgets_bar_notificationbell",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/PowerMenu.qml",
+      "source": "widgets_bar_powermenu",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/PowerOff.qml",
+      "source": "widgets_bar_poweroff",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Red.qml",
+      "source": "widgets_bar_red",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Spotify.qml",
+      "source": "widgets_bar_spotify",
+      "target": "services_popupstate"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/AudioVisualization.qml",
+      "source": "widgets_bar_audiovisualization",
+      "target": "services_cavaservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Cpu.qml",
+      "source": "widgets_bar_cpu",
+      "target": "services_cpuservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Red.qml",
+      "source": "widgets_bar_red",
+      "target": "services_networkstats"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Red.qml",
+      "source": "widgets_bar_red",
+      "target": "services_wifiservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/WifiNetworkList.qml",
+      "source": "widgets_bar_wifinetworklist",
+      "target": "services_wifiservice"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/WifiNetworkRow.qml",
+      "source": "widgets_bar_wifinetworkrow",
+      "target": "services_wifiservice"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Equalizer/EqControlsCard.qml",
+      "source": "widgets_equalizer_eqcontrolscard",
+      "target": "widgets_equalizer_eqlightningcanvas"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Equalizer/EqControlsCard.qml",
+      "source": "widgets_equalizer_eqcontrolscard",
+      "target": "widgets_equalizer_equalizerbackend"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "Widgets/Equalizer/EqLightningCanvas.qml",
+      "source": "widgets_equalizer_eqlightningcanvas",
+      "target": "widgets_equalizer_equalizerbackend"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Equalizer/EqualizerBackend.qml",
+      "source": "widgets_equalizer_equalizerbackend",
+      "target": "eq_parametric_eq"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Equalizer/EqualizerBackend.qml",
+      "source": "widgets_equalizer_equalizerbackend",
+      "target": "widgets_equalizer_equalizerbackend"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Battery.qml",
+      "source": "widgets_bar_battery",
+      "target": "widgets_general_hoverpopup"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/Pipewire.qml",
+      "source": "widgets_bar_pipewire",
+      "target": "widgets_general_hoverpopup"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Widgets/General/HoverPopup.qml",
+      "source": "widgets_general_hoverpopup",
+      "target": "widgets_general_panelpopup"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/General/PanelPopup.qml",
+      "source": "widgets_general_panelpopup",
+      "target": "widgets_general_panel"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/AudioVisualization.qml",
+      "source": "widgets_bar_audiovisualization",
+      "target": "commons_ref"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/MidSide.qml",
+      "source": "widgets_bar_midside",
+      "target": "widgets_bar_archwallpaperbutton"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_barclock"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "Widgets/Bar/BarPill.qml",
+      "source": "widgets_bar_barpill",
+      "target": "widgets_bar_barpill"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_barpill"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_barpill"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_battery"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_bleactivate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/BluetoothDeviceRow.qml",
+      "source": "widgets_bar_bluetoothdevicerow",
+      "target": "widgets_bar_bluetoothactionbutton"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/WifiNetworkRow.qml",
+      "source": "widgets_bar_wifinetworkrow",
+      "target": "widgets_bar_bluetoothactionbutton"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/BluetoothDeviceList.qml",
+      "source": "widgets_bar_bluetoothdevicelist",
+      "target": "widgets_bar_bluetoothdevicerow"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_cpu"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_eqactivate"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_pipewire"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/LeftSide.qml",
+      "source": "widgets_bar_leftside",
+      "target": "widgets_bar_red"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_notificationbell"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_poweroff"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_spoti"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/RightSide.qml",
+      "source": "widgets_bar_rightside",
+      "target": "widgets_bar_spotify"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Widgets/Bar/WifiNetworkList.qml",
+      "source": "widgets_bar_wifinetworklist",
+      "target": "widgets_bar_wifinetworkrow"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "theming_flow",
+      "label": "Dynamic Theming System",
+      "nodes": [
+        "services_wallpaperservice",
+        "commons_colors",
+        "commons_ordercolors",
+        "services_themesync"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "notification_system",
+      "label": "Notification Pipeline",
+      "nodes": [
+        "services_notificationservice",
+        "modules_bar",
+        "widgets_bar_notificationlist"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9
+    },
+    {
+      "id": "media_visualization",
+      "label": "Media & Audio Visualization",
+      "nodes": [
+        "services_spotifyinfo",
+        "services_cavaservice",
+        "modules_bar"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "equalizer_system",
+      "label": "Equalizer System",
+      "nodes": [
+        "widgets_equalizer_eqcontrolscard",
+        "widgets_equalizer_eqlightningcanvas",
+        "widgets_equalizer_equalizerbackend",
+        "eq_parametric_eq"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "ui_components_general",
+      "label": "General UI Components",
+      "nodes": [
+        "widgets_general_panel",
+        "widgets_general_panelpopup",
+        "widgets_general_hoverpopup",
+        "widgets_general_mediabutton"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9
+    },
+    {
+      "id": "bar_layout_components",
+      "label": "Bar Layout Components",
+      "nodes": [
+        "widgets_bar_leftside",
+        "widgets_bar_midside",
+        "widgets_bar_rightside"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "popup_trigger_pattern",
+      "label": "Popup Trigger Pattern",
+      "nodes": [
+        "widgets_bar_archwallpaperbutton",
+        "widgets_bar_bleactivate",
+        "widgets_bar_eqactivate",
+        "widgets_bar_notificationbell",
+        "widgets_bar_poweroff",
+        "widgets_bar_red",
+        "widgets_bar_spotify"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9
+    }
+  ]
+}

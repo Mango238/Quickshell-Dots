@@ -1,0 +1,312 @@
+{
+  "Widgets/Bar/Rust/cpu/src/main.rs": {
+    "mtime": 1784606982.4121985,
+    "ast_hash": "e1741462ef3e58c6739631c99c6a8333",
+    "semantic_hash": "e1741462ef3e58c6739631c99c6a8333"
+  },
+  "scripts/eq_filter_chain.sh": {
+    "mtime": 1783990194.4234972,
+    "ast_hash": "d4985ca3da8c7ab5c675cbb38826b8bd",
+    "semantic_hash": "d4985ca3da8c7ab5c675cbb38826b8bd"
+  },
+  "scripts/lock-listener.sh": {
+    "mtime": 1784838468.4212773,
+    "ast_hash": "0cb2a0fcfc251454e4e0146599fd2762",
+    "semantic_hash": "0cb2a0fcfc251454e4e0146599fd2762"
+  },
+  "eq/parametric-eq.txt": {
+    "mtime": 1784842928.624201,
+    "ast_hash": "09f7e706ee81a958ebf847be8f980e71",
+    "semantic_hash": "09f7e706ee81a958ebf847be8f980e71"
+  },
+  "Commons/Colors.qml": {
+    "mtime": 1784837253.6365018,
+    "ast_hash": "cf7ad683c56b9023717d361ecd95db13",
+    "semantic_hash": "cf7ad683c56b9023717d361ecd95db13"
+  },
+  "Commons/DankCircularImage.qml": {
+    "mtime": 1783638388.2235081,
+    "ast_hash": "6c6b8218d0337a4161944777a014b6f3",
+    "semantic_hash": "6c6b8218d0337a4161944777a014b6f3"
+  },
+  "Commons/FuzzySort.qml": {
+    "mtime": 1772655771.9394183,
+    "ast_hash": "6ebd7eb6f0b5e2a95655f2e33d84ae97",
+    "semantic_hash": "6ebd7eb6f0b5e2a95655f2e33d84ae97"
+  },
+  "Commons/OrderColors.qml": {
+    "mtime": 1784610762.9741163,
+    "ast_hash": "1be4d344b433760baec27c2e0397b500",
+    "semantic_hash": "1be4d344b433760baec27c2e0397b500"
+  },
+  "Commons/Ref.qml": {
+    "mtime": 1783542860.0488846,
+    "ast_hash": "44594c397c58be31cb163ca061e8e01c",
+    "semantic_hash": "44594c397c58be31cb163ca061e8e01c"
+  },
+  "Commons/ThemeIcons.qml": {
+    "mtime": 1784762259.8607,
+    "ast_hash": "cef969d38178fdb113f47c78d2e35b8f",
+    "semantic_hash": "cef969d38178fdb113f47c78d2e35b8f"
+  },
+  "Lock.qml": {
+    "mtime": 1784838452.930467,
+    "ast_hash": "e3117e275c8a7ba21e0b01b858832703",
+    "semantic_hash": "e3117e275c8a7ba21e0b01b858832703"
+  },
+  "Modules/Bar.qml": {
+    "mtime": 1784837729.3295984,
+    "ast_hash": "7642ef916fb7ed1b1a34e89dd1cfecaf",
+    "semantic_hash": "7642ef916fb7ed1b1a34e89dd1cfecaf"
+  },
+  "Modules/ClockWidget.qml": {
+    "mtime": 1784483060.457615,
+    "ast_hash": "87d147c936ea3fdc6d79ddf9c6306c39",
+    "semantic_hash": "87d147c936ea3fdc6d79ddf9c6306c39"
+  },
+  "Modules/Equalizer.qml": {
+    "mtime": 1784840441.0681198,
+    "ast_hash": "ab6deeca98800cd9e8b414c6615ae530",
+    "semantic_hash": "ab6deeca98800cd9e8b414c6615ae530"
+  },
+  "Modules/NotificationToast.qml": {
+    "mtime": 1784761957.6709387,
+    "ast_hash": "528cf42f84bec50b0fa2319aafc5107e",
+    "semantic_hash": "528cf42f84bec50b0fa2319aafc5107e"
+  },
+  "Services/CavaService.qml": {
+    "mtime": 1784483068.8792973,
+    "ast_hash": "062b53d2d6b6ccbd86cc4783105c6f30",
+    "semantic_hash": "062b53d2d6b6ccbd86cc4783105c6f30"
+  },
+  "Services/CpuService.qml": {
+    "mtime": 1784762385.9138713,
+    "ast_hash": "910ea09fc36218a54cbd13d2b40b1b6d",
+    "semantic_hash": "910ea09fc36218a54cbd13d2b40b1b6d"
+  },
+  "Services/EqBootstrap.qml": {
+    "mtime": 1784608400.683673,
+    "ast_hash": "8fb2d67c2f41d2fcbb8f93cf0c3faa7f",
+    "semantic_hash": "8fb2d67c2f41d2fcbb8f93cf0c3faa7f"
+  },
+  "Services/NetworkStats.qml": {
+    "mtime": 1784483118.2351542,
+    "ast_hash": "8964d4bda7d6a76fba9350dc2b4b8f22",
+    "semantic_hash": "8964d4bda7d6a76fba9350dc2b4b8f22"
+  },
+  "Services/NotificationService.qml": {
+    "mtime": 1784682176.6603272,
+    "ast_hash": "c17a59218f080153c38aa0e564414db0",
+    "semantic_hash": "c17a59218f080153c38aa0e564414db0"
+  },
+  "Services/PopupState.qml": {
+    "mtime": 1784611371.4282837,
+    "ast_hash": "4b29a0448456f9c9bd45f0a6281e4378",
+    "semantic_hash": "4b29a0448456f9c9bd45f0a6281e4378"
+  },
+  "Services/SpotifyInfo.qml": {
+    "mtime": 1784613337.6765895,
+    "ast_hash": "ac7873751b76570f9b89dea044917f6e",
+    "semantic_hash": "ac7873751b76570f9b89dea044917f6e"
+  },
+  "Services/ThemeSync.qml": {
+    "mtime": 1784330079.2050128,
+    "ast_hash": "dd67ad1e51fb497c0812cacb8e0649b4",
+    "semantic_hash": "dd67ad1e51fb497c0812cacb8e0649b4"
+  },
+  "Services/WallpaperService.qml": {
+    "mtime": 1784608916.7021782,
+    "ast_hash": "697dc3c180535d70b1d1ef4153eb1160",
+    "semantic_hash": "697dc3c180535d70b1d1ef4153eb1160"
+  },
+  "Services/WifiService.qml": {
+    "mtime": 1784430887.4451277,
+    "ast_hash": "3b9b52614a3ede6a0a5cf8d8298a4eea",
+    "semantic_hash": "3b9b52614a3ede6a0a5cf8d8298a4eea"
+  },
+  "Widgets/Bar/ArchWallpaperButton.qml": {
+    "mtime": 1784608491.10657,
+    "ast_hash": "85ba5b0a70ca3e2f8178fb8028b30f67",
+    "semantic_hash": "85ba5b0a70ca3e2f8178fb8028b30f67"
+  },
+  "Widgets/Bar/AudioVisualization.qml": {
+    "mtime": 1784679477.6033971,
+    "ast_hash": "0aa2de9914d10bd73709532eb0a0426e",
+    "semantic_hash": "0aa2de9914d10bd73709532eb0a0426e"
+  },
+  "Widgets/Bar/BarClock.qml": {
+    "mtime": 1784494930.4295056,
+    "ast_hash": "6751917eaeac774eb0f9452fa6e35a5a",
+    "semantic_hash": "6751917eaeac774eb0f9452fa6e35a5a"
+  },
+  "Widgets/Bar/BarPill.qml": {
+    "mtime": 1784265124.1389554,
+    "ast_hash": "35c3315bb7b525af283f5da820e57511",
+    "semantic_hash": "35c3315bb7b525af283f5da820e57511"
+  },
+  "Widgets/Bar/Battery.qml": {
+    "mtime": 1784761660.11656,
+    "ast_hash": "efa514fc321aa0c0ffa17f26b8b51ead",
+    "semantic_hash": "efa514fc321aa0c0ffa17f26b8b51ead"
+  },
+  "Widgets/Bar/BleActivate.qml": {
+    "mtime": 1784494939.100867,
+    "ast_hash": "0a4a0af891e5dbe835897f842ff68c29",
+    "semantic_hash": "0a4a0af891e5dbe835897f842ff68c29"
+  },
+  "Widgets/Bar/BluetoothActionButton.qml": {
+    "mtime": 1784607636.831358,
+    "ast_hash": "edff8b51457c69bbb87bfc3108d8bf1a",
+    "semantic_hash": "edff8b51457c69bbb87bfc3108d8bf1a"
+  },
+  "Widgets/Bar/BluetoothDeviceList.qml": {
+    "mtime": 1784761955.5670323,
+    "ast_hash": "c2881d8e4cefac3917ade8e4c2edd4d9",
+    "semantic_hash": "c2881d8e4cefac3917ade8e4c2edd4d9"
+  },
+  "Widgets/Bar/BluetoothDeviceRow.qml": {
+    "mtime": 1783373097.5422645,
+    "ast_hash": "8b41994a6ee02c8fd676dfa222c32f14",
+    "semantic_hash": "8b41994a6ee02c8fd676dfa222c32f14"
+  },
+  "Widgets/Bar/Cpu.qml": {
+    "mtime": 1784494911.9654572,
+    "ast_hash": "f98105e240a9f8f990c296840298d300",
+    "semantic_hash": "f98105e240a9f8f990c296840298d300"
+  },
+  "Widgets/Bar/EqActivate.qml": {
+    "mtime": 1784056431.345929,
+    "ast_hash": "1ff5d426a07d7d1312ffd3dd6aa58586",
+    "semantic_hash": "1ff5d426a07d7d1312ffd3dd6aa58586"
+  },
+  "Widgets/Bar/LeftSide.qml": {
+    "mtime": 1784761631.359452,
+    "ast_hash": "5871f2e28e60fe72ed164278c01f7467",
+    "semantic_hash": "5871f2e28e60fe72ed164278c01f7467"
+  },
+  "Widgets/Bar/MidSide.qml": {
+    "mtime": 1784761651.1385257,
+    "ast_hash": "03aa6c31303fab81e4e668516f3fa92a",
+    "semantic_hash": "03aa6c31303fab81e4e668516f3fa92a"
+  },
+  "Widgets/Bar/NotificationBell.qml": {
+    "mtime": 1784680758.7031143,
+    "ast_hash": "35bc9b8aec92491e1dc998aceaafcdbd",
+    "semantic_hash": "35bc9b8aec92491e1dc998aceaafcdbd"
+  },
+  "Widgets/Bar/NotificationList.qml": {
+    "mtime": 1784761959.464859,
+    "ast_hash": "495c3e10d1ebe2269a4449b9fb232035",
+    "semantic_hash": "495c3e10d1ebe2269a4449b9fb232035"
+  },
+  "Widgets/Bar/Pipewire.qml": {
+    "mtime": 1784761664.7025776,
+    "ast_hash": "57e002ef3257d29f00cf7b5a5fec392e",
+    "semantic_hash": "57e002ef3257d29f00cf7b5a5fec392e"
+  },
+  "Widgets/Bar/PowerMenu.qml": {
+    "mtime": 1784835742.7768965,
+    "ast_hash": "64791c7acec089e0a3c03c935458819d",
+    "semantic_hash": "64791c7acec089e0a3c03c935458819d"
+  },
+  "Widgets/Bar/PowerOff.qml": {
+    "mtime": 1784607685.1517098,
+    "ast_hash": "3b11ca0ad03ca72886c18519ddd68e16",
+    "semantic_hash": "3b11ca0ad03ca72886c18519ddd68e16"
+  },
+  "Widgets/Bar/Red.qml": {
+    "mtime": 1784494903.6653056,
+    "ast_hash": "3ced926092a469cb79eba6ef74e23954",
+    "semantic_hash": "3ced926092a469cb79eba6ef74e23954"
+  },
+  "Widgets/Bar/RightSide.qml": {
+    "mtime": 1784761639.9424837,
+    "ast_hash": "a84dabdc58b695f796da1b9a0d4328ee",
+    "semantic_hash": "a84dabdc58b695f796da1b9a0d4328ee"
+  },
+  "Widgets/Bar/Spoti.qml": {
+    "mtime": 1784607700.8911943,
+    "ast_hash": "e43fbe9b56e1d808d52b0f3102222cb3",
+    "semantic_hash": "e43fbe9b56e1d808d52b0f3102222cb3"
+  },
+  "Widgets/Bar/Spotify.qml": {
+    "mtime": 1784607581.5593095,
+    "ast_hash": "63e623e81ecb4ed53635a91b5da9184d",
+    "semantic_hash": "63e623e81ecb4ed53635a91b5da9184d"
+  },
+  "Widgets/Bar/SpotifyAll.qml": {
+    "mtime": 1784837816.0409677,
+    "ast_hash": "14e6a29e2f84a58995d9a7fc780cb2ac",
+    "semantic_hash": "14e6a29e2f84a58995d9a7fc780cb2ac"
+  },
+  "Widgets/Bar/WallpaperGrid.qml": {
+    "mtime": 1784761949.7352943,
+    "ast_hash": "598c637dc02507ff12495776639fee86",
+    "semantic_hash": "598c637dc02507ff12495776639fee86"
+  },
+  "Widgets/Bar/WallpaperThumbnail.qml": {
+    "mtime": 1784325356.965238,
+    "ast_hash": "ec8c08731302f267abca01ef2db53307",
+    "semantic_hash": "ec8c08731302f267abca01ef2db53307"
+  },
+  "Widgets/Bar/WifiNetworkList.qml": {
+    "mtime": 1784761953.5771215,
+    "ast_hash": "2ca659d36bb46c0296ae24481f17158d",
+    "semantic_hash": "2ca659d36bb46c0296ae24481f17158d"
+  },
+  "Widgets/Bar/WifiNetworkRow.qml": {
+    "mtime": 1784430715.220461,
+    "ast_hash": "26b4039bf460f65dfa616e996f8e7a6e",
+    "semantic_hash": "26b4039bf460f65dfa616e996f8e7a6e"
+  },
+  "Widgets/Equalizer/EqControlsCard.qml": {
+    "mtime": 1784840434.043361,
+    "ast_hash": "4de9eb894b5821f40bfe926207f4023a",
+    "semantic_hash": "4de9eb894b5821f40bfe926207f4023a"
+  },
+  "Widgets/Equalizer/EqLightningCanvas.qml": {
+    "mtime": 1784840302.300047,
+    "ast_hash": "40436bb51f0df32fa4d91735ba85998e",
+    "semantic_hash": "40436bb51f0df32fa4d91735ba85998e"
+  },
+  "Widgets/Equalizer/EqualizerBackend.qml": {
+    "mtime": 1784243491.532501,
+    "ast_hash": "de4547a3e8f68efb25738a1e40a5b9d0",
+    "semantic_hash": "de4547a3e8f68efb25738a1e40a5b9d0"
+  },
+  "Widgets/General/AlbumArt.qml": {
+    "mtime": 1784836374.6623614,
+    "ast_hash": "b905be1715977249489c6303a39103d9",
+    "semantic_hash": "b905be1715977249489c6303a39103d9"
+  },
+  "Widgets/General/DirectorySearchBar.qml": {
+    "mtime": 1784761947.8303804,
+    "ast_hash": "c8fd6a95ca8ca47ff2bcb4c4c9f82fe6",
+    "semantic_hash": "c8fd6a95ca8ca47ff2bcb4c4c9f82fe6"
+  },
+  "Widgets/General/HoverPopup.qml": {
+    "mtime": 1783200854.8148346,
+    "ast_hash": "319c0fed08160434dc06162dfd47a845",
+    "semantic_hash": "319c0fed08160434dc06162dfd47a845"
+  },
+  "Widgets/General/MediaButton.qml": {
+    "mtime": 1783201719.0453773,
+    "ast_hash": "d8e119ff64b8fc16ae1bd1d7c960254d",
+    "semantic_hash": "d8e119ff64b8fc16ae1bd1d7c960254d"
+  },
+  "Widgets/General/Panel.qml": {
+    "mtime": 1783202998.2226114,
+    "ast_hash": "f4b63f50f329e03b24bd5f4164b08602",
+    "semantic_hash": "f4b63f50f329e03b24bd5f4164b08602"
+  },
+  "Widgets/General/PanelPopup.qml": {
+    "mtime": 1784609761.0534742,
+    "ast_hash": "24768f844fa5bed3dbce3e558e4cefa8",
+    "semantic_hash": "24768f844fa5bed3dbce3e558e4cefa8"
+  },
+  "shell.qml": {
+    "mtime": 1784682203.2790344,
+    "ast_hash": "607c66f37e857054db599befe548f730",
+    "semantic_hash": "607c66f37e857054db599befe548f730"
+  }
+}
