@@ -1,0 +1,10 @@
+# graphify: caché regenerable (graphify update .)
+graphify-out/cache/
+
+# caché de runtime de widgets
+Widgets/Bar/.cache
+
+# editor / OS
+*~
+*.swp
+.DS_Store
