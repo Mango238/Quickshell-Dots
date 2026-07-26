@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Commons
 
 /**
  * DirectorySearchBar.qml — Barra de búsqueda de directorios, anclable.
@@ -105,7 +106,7 @@ Rectangle {
     border.width: textInput.activeFocus ? 2 : 1
     border.color: textInput.activeFocus ? root.accentColor : Qt.rgba(1, 1, 1, 0.12)
 
-    Behavior on border.color { ColorAnimation { duration: 120 } }
+    Behavior on border.color { ColorAnimation { duration: Config.anim.instant } }
 
     Text {
         id: icon
@@ -226,14 +227,14 @@ Rectangle {
             ? Math.min(root.suggestions.length, 6) * 32
             : 0
         Behavior on height {
-            NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 140; easing.type: Config.easingOf(Config.anim.standard) }
         }
 
         // Opacity aparte del height: así el contenido hace fade mientras
         // el alto se acomoda, en vez de un corte seco al llegar a 0.
         opacity: (root.suggestions.length > 0 && textInput.activeFocus) ? 1 : 0
         Behavior on opacity {
-            NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) }
         }
         visible: opacity > 0
 

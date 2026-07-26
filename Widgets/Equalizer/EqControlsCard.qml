@@ -54,11 +54,11 @@ Item {
         }
         SequentialAnimation {
             PauseAnimation { duration: 120 }
-            NumberAnimation { target: root; property: "introEqSliders"; from: 0; to: 1.0; duration: 860; easing.type: Easing.OutExpo }
+            NumberAnimation { target: root; property: "introEqSliders"; from: 0; to: 1.0; duration: 860; easing.type: Config.easingOf(Config.anim.decelerate) }
         }
         SequentialAnimation {
             PauseAnimation { duration: 240 }
-            NumberAnimation { target: root; property: "introPresets"; from: 0; to: 1.0; duration: 810; easing.type: Easing.OutBack; easing.overshoot: 0.8 }
+            NumberAnimation { target: root; property: "introPresets"; from: 0; to: 1.0; duration: 810; easing.type: Config.easingOf(Config.anim.emphasized); easing.overshoot: 0.8 }
         }
     }
 
@@ -75,7 +75,7 @@ Item {
             Text {
                 text: "Equalizer"
                 color: root.cAccent
-                font.family: "JetBrainsMono Nerd Font"
+                font.family: Config.font
                 font.pixelSize: 16
                 font.bold: true
                 Layout.fillWidth: true
@@ -93,8 +93,8 @@ Item {
                 border.color: applyBtn.pending ? root.cAccent : root.cSurface2
                 border.width: 1
 
-                Behavior on color { ColorAnimation { duration: 300; easing.type: Easing.OutCubic } }
-                Behavior on border.color { ColorAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                Behavior on color { ColorAnimation { duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) } }
+                Behavior on border.color { ColorAnimation { duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) } }
 
                 layer.enabled: applyBtn.pending
                 layer.effect: MultiEffect {
@@ -109,10 +109,10 @@ Item {
                     anchors.centerIn: parent
                     text: root.backend.isBusy ? "Applying" : (applyBtn.pending ? "Apply" : "Saved")
                     color: applyBtn.pending ? root.cOnAccent : root.cSubText
-                    font.family: "JetBrainsMono Nerd Font"
+                    font.family: Config.font
                     font.pixelSize: 12
                     font.bold: true
-                    Behavior on color { ColorAnimation { duration: 300 } }
+                    Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                 }
 
                 MouseArea {
@@ -129,7 +129,7 @@ Item {
             Text {
                 text: root.backend.selectedPreset || "Flat"
                 color: root.cSubText
-                font.family: "JetBrainsMono Nerd Font"
+                font.family: Config.font
                 font.pixelSize: 14
                 font.bold: true
                 Layout.leftMargin: 15
@@ -182,8 +182,8 @@ Item {
                             }
                         }
 
-                        NumberAnimation { id: trackPulseAnim; target: sliderDelegate; property: "trackPulse"; from: 0.0; to: 1.0; duration: 1000; easing.type: Easing.OutQuart }
-                        NumberAnimation { id: ringPulseAnim; target: sliderDelegate; property: "ringPulse"; from: 1.0; to: 0.0; duration: 1500; easing.type: Easing.OutExpo }
+                        NumberAnimation { id: trackPulseAnim; target: sliderDelegate; property: "trackPulse"; from: 0.0; to: 1.0; duration: Config.anim.ambient; easing.type: Easing.OutQuart }
+                        NumberAnimation { id: ringPulseAnim; target: sliderDelegate; property: "ringPulse"; from: 1.0; to: 0.0; duration: 1500; easing.type: Config.easingOf(Config.anim.decelerate) }
                         NumberAnimation { id: flashFadeAnim; target: sliderDelegate; property: "flashFade"; from: 1.0; to: 0.0; duration: 1500; easing.type: Easing.OutSine }
 
                         ColumnLayout {
@@ -359,7 +359,7 @@ Item {
                             Text {
                                 text: sliderDelegate.modelData
                                 color: root.cFreqLabel
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 10
                                 font.bold: true
                                 Layout.alignment: Qt.AlignHCenter
@@ -424,7 +424,7 @@ Item {
                 elide: Text.ElideRight
                 text: root.backend.applyStatus
                 color: root.cSubText
-                font.family: "JetBrainsMono Nerd Font"
+                font.family: Config.font
                 font.pixelSize: 11
                 font.bold: true
             }
@@ -441,15 +441,15 @@ Item {
                 border.color: bypassBtn.bypassed ? Colors.danger : root.cSurface2
                 opacity: root.backend.isBusy ? 0.5 : 1.0
 
-                Behavior on color { ColorAnimation { duration: 200 } }
-                Behavior on border.color { ColorAnimation { duration: 200 } }
+                Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                Behavior on border.color { ColorAnimation { duration: Config.anim.base } }
 
                 Text {
                     id: bypassTxt
                     anchors.centerIn: parent
                     text: bypassBtn.bypassed ? "Activar EQ" : "Bypass"
                     color: bypassBtn.bypassed ? Colors.danger : root.cSubText
-                    font.family: "JetBrainsMono Nerd Font"
+                    font.family: Config.font
                     font.pixelSize: 11
                     font.bold: true
                 }
@@ -488,17 +488,17 @@ Item {
         color: presetBtn.isActivePreset ? root.cAccent : (presetBtn.isHovered ? root.cSurface1 : root.cPresetIdle)
         scale: presetBtn.isHovered && !presetBtn.isActivePreset ? 1.05 : 1.0
 
-        Behavior on color { ColorAnimation { duration: 200 } }
-        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+        Behavior on color { ColorAnimation { duration: Config.anim.base } }
+        Behavior on scale { NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
         Text {
             anchors.centerIn: parent
             text: presetBtn.name
             color: presetBtn.isActivePreset ? root.cOnAccent : (presetBtn.isHovered ? root.cText : root.cSubText)
-            font.family: "JetBrainsMono Nerd Font"
+            font.family: Config.font
             font.pixelSize: 12
             font.bold: true
-            Behavior on color { ColorAnimation { duration: 200 } }
+            Behavior on color { ColorAnimation { duration: Config.anim.base } }
         }
 
         MouseArea {

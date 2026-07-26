@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
+import qs.Commons
 
 PopupWindow {
     id: panelPopup
@@ -184,8 +185,8 @@ PopupWindow {
         Behavior on opacity {
             NumberAnimation {
                 id: fadeAnim
-                duration: 130
-                easing.type: Easing.OutCubic
+                duration: Config.anim.panel
+                easing.type: Config.easingOf(Config.anim.standard)
             }
         }
 

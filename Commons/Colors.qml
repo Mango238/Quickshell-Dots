@@ -73,7 +73,7 @@ Singleton {
         id: getWallpaper
         running: false
         // Invocamos a sh para que entienda el pipe '|'
-        command: [ "sh", "-c", "awww query | awk -F'image: ' '{print $2}' | head -n1" ]
+        command: [ "sh", "-c", Config.wallpaper.backend + " query | awk -F'image: ' '{print $2}' | head -n1" ]
         
         stdout: StdioCollector {
             // Usamos el argumento directamente en lugar de 'this'
@@ -95,7 +95,7 @@ Singleton {
 
     FileView {
         id: file
-        path: "/tmp/actual_wallpaper.txt"
+        path: Config.wallpaper.stateFile
         watchChanges: true
         // En el primer arranque tras un reboot el archivo aún no existe; el caso
         // ya está cubierto por onLoadFailed (fallback a `awww query`), así que

@@ -32,13 +32,6 @@ ShellRoot {
     readonly property color blue:  "#89B4FA"        // hardcode: acento secundario (reboot/clima)
     readonly property color green: "#A6E3A1"        // hardcode: no hay rol "ok" en la paleta
 
-    // Session Settings (Changed from Settings to QtObject to fix the Qt 6.11 initialization error)
-    QtObject {
-        id: lockSettings
-        property bool hidePassword: false
-        property int revealDuration: 300
-    }
-
     // Shared state across all monitors
     QtObject {
         id: lockUI
@@ -91,17 +84,17 @@ ShellRoot {
 
     Process {
         id: suspendProcess
-        command: ["systemctl", "suspend"]
+        command: Config.power.suspend
     }
 
     Process {
         id: poweroffProcess
-        command: ["systemctl", "poweroff"]
+        command: Config.power.poweroff
     }
 
     Process {
         id: reloadProcess
-        command: ["systemctl", "reboot"]
+        command: Config.power.reboot
     }
 
     WlSessionLock {
@@ -134,8 +127,12 @@ ShellRoot {
 
                 property string batPct: "100"
                 property string batStatus: "AC"
-                property string currentUser: "User"
-                property string faceIconPath: ""
+                // Override de Config.user.* si está seteado; si no, autodetect
+                // (userPoller de abajo) tal como siempre.
+                property string currentUser: Config.user.displayName !== "" ? Config.user.displayName : "User"
+                property string faceIconPath: Config.user.avatar !== ""
+                    ? (Config.user.avatar.startsWith("file://") ? Config.user.avatar : "file://" + Config.user.avatar)
+                    : ""
                 property string kbLayout: "US"
                 // Placeholder de clima (sin poller): cablear a un script propio a futuro.
                 property string weatherIcon: "󰖙"
@@ -190,9 +187,11 @@ ShellRoot {
                     ]
                     stdout: StdioCollector {
                         onStreamFinished: {
+                            // Config.user.* manda si está seteado: no pisar un
+                            // override explícito con el autodetect.
                             let parts = this.text.trim().split("|");
-                            if (parts.length > 0 && parts[0] !== "") screenRoot.currentUser = parts[0];
-                            if (parts.length > 1 && parts[1].trim() !== "") {
+                            if (Config.user.displayName === "" && parts.length > 0 && parts[0] !== "") screenRoot.currentUser = parts[0];
+                            if (Config.user.avatar === "" && parts.length > 1 && parts[1].trim() !== "") {
                                 let path = parts[1].trim();
                                 screenRoot.faceIconPath = path.startsWith("file://") ? path : "file://" + path;
                             }
@@ -275,8 +274,8 @@ ShellRoot {
                         scale: 1.0 + Math.sin(screenRoot.globalOrbitAngle * 6) * 0.05
                         opacity: screenRoot.inputActive ? 0.04 : 0.08
                         color: root.mauve
-                        Behavior on color { ColorAnimation { duration: 1000 } }
-                        Behavior on opacity { NumberAnimation { duration: 600 } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.ambient } }
+                        Behavior on opacity { NumberAnimation { duration: Config.anim.slow } }
                     }
 
                     Rectangle {
@@ -286,8 +285,8 @@ ShellRoot {
                         scale: 1.0 + Math.cos(screenRoot.globalOrbitAngle * 5) * 0.05
                         opacity: screenRoot.inputActive ? 0.03 : 0.06
                         color: root.blue
-                        Behavior on color { ColorAnimation { duration: 1000 } }
-                        Behavior on opacity { NumberAnimation { duration: 600 } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.ambient } }
+                        Behavior on opacity { NumberAnimation { duration: Config.anim.slow } }
                     }
 
                     Item {
@@ -307,8 +306,8 @@ ShellRoot {
                                 border.color: lockUI.failed ? root.red : root.text
                                 border.width: Math.max(1, 1 * screenRoot.sc)
                                 opacity: lockUI.failed ? (0.1 - (index * 0.02)) : (screenRoot.inputActive ? (0.02 - (index * 0.005)) : (0.04 - (index * 0.01)))
-                                Behavior on border.color { ColorAnimation { duration: 600; easing.type: Easing.OutExpo } }
-                                Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.OutExpo } }
+                                Behavior on border.color { ColorAnimation { duration: Config.anim.slow; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                                Behavior on opacity { NumberAnimation { duration: Config.anim.slow; easing.type: Config.easingOf(Config.anim.decelerate) } }
                             }
                         }
                     }
@@ -343,9 +342,9 @@ ShellRoot {
                         scale: screenRoot.inputActive ? 0.9 : 1.0
                         visible: opacity > 0.01
 
-                        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 600; easing.type: Easing.OutExpo } }
-                        Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
-                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutBack } }
+                        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Config.anim.slow; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                        Behavior on opacity { NumberAnimation { duration: 400; easing.type: Config.easingOf(Config.anim.standard) } }
+                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                         RowLayout {
                             Layout.alignment: Qt.AlignHCenter
@@ -353,35 +352,35 @@ ShellRoot {
 
                             Text {
                                 id: clockHours
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 140 * screenRoot.sc
                                 font.weight: Font.Bold
                                 color: root.text
-                                Behavior on color { ColorAnimation { duration: 300 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                             }
                             Text {
                                 text: ":"
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 140 * screenRoot.sc
                                 font.weight: Font.Bold
                                 opacity: 0.5
                                 color: root.text
-                                Behavior on color { ColorAnimation { duration: 300 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                             }
                             Text {
                                 id: clockMinutes
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 140 * screenRoot.sc
                                 font.weight: Font.Bold
                                 color: root.text
-                                Behavior on color { ColorAnimation { duration: 300 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                             }
                         }
 
                         Text {
                             id: dateText
                             Layout.alignment: Qt.AlignHCenter
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Config.font
                             font.pixelSize: 22 * screenRoot.sc
                             font.weight: Font.Bold
                             color: root.text
@@ -409,9 +408,9 @@ ShellRoot {
                         scale: screenRoot.inputActive ? 1.0 : 0.9
                         visible: opacity > 0.01
 
-                        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: 600; easing.type: Easing.OutExpo } }
-                        Behavior on opacity { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
-                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Easing.OutBack } }
+                        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Config.anim.slow; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                        Behavior on opacity { NumberAnimation { duration: 400; easing.type: Config.easingOf(Config.anim.standard) } }
+                        Behavior on scale { NumberAnimation { duration: 500; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                         // Left: Enlarged Avatar
                         Item {
@@ -437,7 +436,7 @@ ShellRoot {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "󰄽"
-                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.family: Config.font
                                     font.pixelSize: 64 * screenRoot.sc
                                     color: root.subtext0
                                 }
@@ -467,7 +466,7 @@ ShellRoot {
                                 color: "transparent"
                                 border.color: lockUI.failed ? root.red : (lockUI.authenticating ? root.peach : Qt.rgba(root.text.r, root.text.g, root.text.b, 0.5))
                                 border.width: Math.max(1, 3 * screenRoot.sc)
-                                Behavior on border.color { ColorAnimation { duration: 300 } }
+                                Behavior on border.color { ColorAnimation { duration: Config.anim.panel } }
                             }
                         }
 
@@ -479,7 +478,7 @@ ShellRoot {
                             Text {
                                 Layout.alignment: Qt.AlignLeft
                                 text: screenRoot.currentUser
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 28 * screenRoot.sc
                                 font.weight: Font.Bold
                                 color: root.text
@@ -503,23 +502,23 @@ ShellRoot {
                                         ? root.red
                                         : (lockUI.authenticating ? root.peach : root.mauve)
                                     border.width: Math.max(1, 1 * screenRoot.sc)
-                                    Behavior on color { ColorAnimation { duration: 300 } }
-                                    Behavior on border.color { ColorAnimation { duration: 300 } }
+                                    Behavior on color { ColorAnimation { duration: Config.anim.panel } }
+                                    Behavior on border.color { ColorAnimation { duration: Config.anim.panel } }
 
                                     Text {
                                         anchors.centerIn: parent
                                         text: lockUI.failed ? "󰌾" : (lockUI.authenticating ? "󰌿" : "󰌾")
-                                        font.family: "JetBrainsMono Nerd Font"
+                                        font.family: Config.font
                                         font.pixelSize: 18 * screenRoot.sc
                                         color: lockUI.failed
                                             ? root.red
                                             : (lockUI.authenticating ? root.peach : root.mauve)
-                                        Behavior on color { ColorAnimation { duration: 300 } }
+                                        Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                                     }
                                 }
 
                                 Text {
-                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.family: Config.font
                                     font.pixelSize: 14 * screenRoot.sc
                                     font.weight: Font.Medium
                                     font.letterSpacing: 2.0
@@ -527,7 +526,7 @@ ShellRoot {
                                         ? root.red
                                         : (lockUI.authenticating ? root.peach : root.text)
                                     text: lockUI.statusText.toUpperCase()
-                                    Behavior on color { ColorAnimation { duration: 300 } }
+                                    Behavior on color { ColorAnimation { duration: Config.anim.panel } }
                                 }
                             }
 
@@ -548,19 +547,19 @@ ShellRoot {
                                     return Qt.rgba(root.text.r, root.text.g, root.text.b, 0.08);
                                 }
 
-                                Behavior on color { ColorAnimation { duration: 250; easing.type: Easing.OutExpo } }
-                                Behavior on border.color { ColorAnimation { duration: 250; easing.type: Easing.OutExpo } }
+                                Behavior on color { ColorAnimation { duration: 250; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                                Behavior on border.color { ColorAnimation { duration: 250; easing.type: Config.easingOf(Config.anim.decelerate) } }
 
                                 scale: lockUI.failed ? 1.05 : (lockUI.authenticating ? 0.98 : 1.0)
-                                Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+                                Behavior on scale { NumberAnimation { duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                                 transform: Translate { id: shakeTranslate; x: 0 }
 
                                 SequentialAnimation {
                                     id: shakeAnim
-                                    NumberAnimation { target: shakeTranslate; property: "x"; from: 0; to: -8 * screenRoot.sc; duration: 120; easing.type: Easing.InOutSine }
-                                    NumberAnimation { target: shakeTranslate; property: "x"; from: -8 * screenRoot.sc; to: 8 * screenRoot.sc; duration: 120; easing.type: Easing.InOutSine }
-                                    NumberAnimation { target: shakeTranslate; property: "x"; from: 8 * screenRoot.sc; to: 0; duration: 120; easing.type: Easing.InOutSine }
+                                    NumberAnimation { target: shakeTranslate; property: "x"; from: 0; to: -8 * screenRoot.sc; duration: Config.anim.instant; easing.type: Easing.InOutSine }
+                                    NumberAnimation { target: shakeTranslate; property: "x"; from: -8 * screenRoot.sc; to: 8 * screenRoot.sc; duration: Config.anim.instant; easing.type: Easing.InOutSine }
+                                    NumberAnimation { target: shakeTranslate; property: "x"; from: 8 * screenRoot.sc; to: 0; duration: Config.anim.instant; easing.type: Easing.InOutSine }
                                 }
 
                                 Connections {
@@ -623,7 +622,7 @@ ShellRoot {
                                         if (text !== oldText) {
                                             if (text.length > oldText.length) {
                                                 for (let i = oldText.length; i < text.length; i++) {
-                                                    passModel.append({ "charStr": text.charAt(i), "isDot": lockSettings.hidePassword });
+                                                    passModel.append({ "charStr": text.charAt(i), "isDot": Config.lock.hidePassword });
                                                 }
                                             } else if (text.length < oldText.length) {
                                                 let diff = oldText.length - text.length;
@@ -633,7 +632,7 @@ ShellRoot {
                                             } else {
                                                 passModel.clear();
                                                 for (let i = 0; i < text.length; i++) {
-                                                    passModel.append({ "charStr": text.charAt(i), "isDot": lockSettings.hidePassword });
+                                                    passModel.append({ "charStr": text.charAt(i), "isDot": Config.lock.hidePassword });
                                                 }
                                             }
                                             oldText = text;
@@ -673,7 +672,7 @@ ShellRoot {
                                                 required property int index
                                                 required property var model
                                                 text: model.isDot ? "•" : model.charStr
-                                                font.family: "JetBrainsMono Nerd Font"
+                                                font.family: Config.font
                                                 font.pixelSize: model.isDot ? (32 * screenRoot.sc) : (24 * screenRoot.sc)
                                                 font.weight: Font.Bold
                                                 color: lockUI.failed ? root.red : (lockUI.authenticating ? root.peach : root.text)
@@ -683,8 +682,8 @@ ShellRoot {
                                                 NumberAnimation on opacity { from: 0; to: 1; duration: 150 }
 
                                                 Timer {
-                                                    interval: lockSettings.revealDuration
-                                                    running: !model.isDot && !lockSettings.hidePassword
+                                                    interval: Config.lock.revealDuration
+                                                    running: !model.isDot && !Config.lock.hidePassword
                                                     onTriggered: {
                                                         if (index >= 0 && index < passModel.count) {
                                                             passModel.setProperty(index, "isDot", true);
@@ -724,14 +723,14 @@ ShellRoot {
                         border.width: Math.max(1, 1 * screenRoot.sc)
 
                         scale: isHovered ? 1.05 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutExpo } }
-                        Behavior on color { ColorAnimation { duration: 200 } }
-                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                        Behavior on border.color { ColorAnimation { duration: Config.anim.base } }
 
                         RowLayout {
                             id: kbLayoutRow; anchors.centerIn: parent; spacing: 8 * screenRoot.sc
-                            Text { text: "󰌌"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 * screenRoot.sc; color: parent.parent.isHovered ? root.mauve : root.overlay2; Behavior on color { ColorAnimation { duration: 200 } } }
-                            Text { text: screenRoot.kbLayout; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 * screenRoot.sc; font.weight: Font.Black; color: root.text }
+                            Text { text: "󰌌"; font.family: Config.font; font.pixelSize: 18 * screenRoot.sc; color: parent.parent.isHovered ? root.mauve : root.overlay2; Behavior on color { ColorAnimation { duration: Config.anim.base } } }
+                            Text { text: screenRoot.kbLayout; font.family: Config.font; font.pixelSize: 14 * screenRoot.sc; font.weight: Font.Black; color: root.text }
                         }
                         MouseArea { id: kbMouse; anchors.fill: parent; hoverEnabled: true; enabled: !screenRoot.isPlayingIntro }
                     }
@@ -749,9 +748,9 @@ ShellRoot {
                         border.width: Math.max(1, 1 * screenRoot.sc)
 
                         scale: isHovered ? 1.05 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutExpo } }
-                        Behavior on color { ColorAnimation { duration: 200 } }
-                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                        Behavior on border.color { ColorAnimation { duration: Config.anim.base } }
 
                         RowLayout {
                             id: batLayoutRow; anchors.centerIn: parent; spacing: 8 * screenRoot.sc
@@ -766,18 +765,18 @@ ShellRoot {
 
                             Text {
                                 text: screenRoot.batStatus === "Charging" ? "󰂄" : (parseInt(screenRoot.batPct) < 20 ? "󰂃" : "󰁹")
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 20 * screenRoot.sc
                                 color: batLayoutRow.dynamicBatColor
-                                Behavior on color { ColorAnimation { duration: 200 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.base } }
                             }
                             Text {
                                 text: screenRoot.batPct + "%"
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 14 * screenRoot.sc
                                 font.weight: Font.Black
                                 color: batLayoutRow.dynamicBatColor
-                                Behavior on color { ColorAnimation { duration: 200 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.base } }
                             }
                         }
                         MouseArea { id: batMouse; anchors.fill: parent; hoverEnabled: true; enabled: !screenRoot.isPlayingIntro }
@@ -795,26 +794,26 @@ ShellRoot {
                         border.width: Math.max(1, 1 * screenRoot.sc)
 
                         scale: isHovered ? 1.05 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutExpo } }
-                        Behavior on color { ColorAnimation { duration: 200 } }
-                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                        Behavior on scale { NumberAnimation { duration: 250; easing.type: Config.easingOf(Config.anim.decelerate) } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                        Behavior on border.color { ColorAnimation { duration: Config.anim.base } }
 
                         RowLayout {
                             id: weatherLayoutRow; anchors.centerIn: parent; spacing: 8 * screenRoot.sc
                             Text {
                                 text: screenRoot.weatherIcon
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 20 * screenRoot.sc
                                 color: parent.parent.isHovered ? root.blue : root.text
-                                Behavior on color { ColorAnimation { duration: 200 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.base } }
                             }
                             Text {
                                 text: screenRoot.weatherTemp
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 14 * screenRoot.sc
                                 font.weight: Font.Black
                                 color: root.text
-                                Behavior on color { ColorAnimation { duration: 200 } }
+                                Behavior on color { ColorAnimation { duration: Config.anim.base } }
                             }
                         }
                         MouseArea { id: weatherMouse; anchors.fill: parent; hoverEnabled: true; enabled: !screenRoot.isPlayingIntro }
@@ -840,7 +839,7 @@ ShellRoot {
                     border.color: Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.25)
                     border.width: Math.max(1, 1 * screenRoot.sc)
 
-                    Behavior on height { NumberAnimation { duration: 350; easing.type: Easing.OutExpo } }
+                    Behavior on height { NumberAnimation { duration: 350; easing.type: Config.easingOf(Config.anim.decelerate) } }
                     Behavior on opacity { NumberAnimation { duration: 250 } }
 
                     ColumnLayout {
@@ -854,7 +853,7 @@ ShellRoot {
                         // --- SETTINGS SECTION ---
                         Text {
                             text: "SETTINGS"
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Config.font
                             font.weight: Font.Black
                             font.pixelSize: 12 * screenRoot.sc
                             font.letterSpacing: 1.5
@@ -867,7 +866,7 @@ ShellRoot {
                             Layout.fillWidth: true; Layout.leftMargin: 18 * screenRoot.sc; Layout.rightMargin: 18 * screenRoot.sc; Layout.topMargin: 4 * screenRoot.sc
                             Text {
                                 text: "Hide password"
-                                font.family: "JetBrainsMono Nerd Font"
+                                font.family: Config.font
                                 font.pixelSize: 14 * screenRoot.sc
                                 font.weight: Font.Medium
                                 color: root.text
@@ -878,21 +877,21 @@ ShellRoot {
                                 Layout.preferredWidth: 40 * screenRoot.sc
                                 Layout.preferredHeight: 22 * screenRoot.sc
                                 radius: height / 2
-                                color: lockSettings.hidePassword ? root.mauve : root.surface2
+                                color: Config.lock.hidePassword ? root.mauve : root.surface2
                                 Behavior on color { ColorAnimation { duration: 250 } }
 
                                 Rectangle {
                                     width: height; height: 18 * screenRoot.sc; radius: height / 2
-                                    x: lockSettings.hidePassword ? parent.width - width - (2 * screenRoot.sc) : (2 * screenRoot.sc)
+                                    x: Config.lock.hidePassword ? parent.width - width - (2 * screenRoot.sc) : (2 * screenRoot.sc)
                                     y: (parent.height - height) / 2
                                     color: root.base
-                                    Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                                    Behavior on x { NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) } }
                                 }
                                 MouseArea {
                                     anchors.fill: parent;
                                     onClicked: {
-                                        lockSettings.hidePassword = !lockSettings.hidePassword;
-                                        if (lockSettings.hidePassword) {
+                                        Config.lock.hidePassword = !Config.lock.hidePassword;
+                                        if (Config.lock.hidePassword) {
                                             for(let i = 0; i < passModel.count; i++) passModel.setProperty(i, "isDot", true);
                                         }
                                     }
@@ -903,22 +902,22 @@ ShellRoot {
                         // Reveal Delay Slider
                         ColumnLayout {
                             Layout.fillWidth: true; Layout.leftMargin: 18 * screenRoot.sc; Layout.rightMargin: 18 * screenRoot.sc; Layout.topMargin: 8 * screenRoot.sc; Layout.bottomMargin: 8 * screenRoot.sc; spacing: 8 * screenRoot.sc
-                            opacity: lockSettings.hidePassword ? 0.3 : 1.0
-                            Behavior on opacity { NumberAnimation { duration: 200 } }
+                            opacity: Config.lock.hidePassword ? 0.3 : 1.0
+                            Behavior on opacity { NumberAnimation { duration: Config.anim.base } }
 
                             RowLayout {
                                 Layout.fillWidth: true
                                 Text {
                                     text: "Reveal delay"
-                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.family: Config.font
                                     font.pixelSize: 14 * screenRoot.sc
                                     font.weight: Font.Medium
                                     color: root.blue
                                     Layout.fillWidth: true
                                 }
                                 Text {
-                                    text: lockSettings.revealDuration >= 1000 ? (lockSettings.revealDuration / 1000).toFixed(1) + " s" : lockSettings.revealDuration + " ms"
-                                    font.family: "JetBrainsMono Nerd Font"
+                                    text: Config.lock.revealDuration >= 1000 ? (Config.lock.revealDuration / 1000).toFixed(1) + " s" : Config.lock.revealDuration + " ms"
+                                    font.family: Config.font
                                     font.pixelSize: 13 * screenRoot.sc
                                     font.weight: Font.Bold
                                     color: root.peach
@@ -932,7 +931,7 @@ ShellRoot {
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: parent.width; height: 8 * screenRoot.sc; radius: height / 2; color: root.surface2
                                     Rectangle {
-                                        width: ((lockSettings.revealDuration - 100) / 2900) * parent.width
+                                        width: ((Config.lock.revealDuration - 100) / 2900) * parent.width
                                         height: parent.height; radius: height / 2; color: root.mauve
                                     }
                                 }
@@ -945,10 +944,10 @@ ShellRoot {
                                     color: root.peach
                                     border.color: root.crust; border.width: Math.max(1, 2 * screenRoot.sc)
                                     anchors.verticalCenter: parent.verticalCenter
-                                    x: Math.max(0, Math.min(((lockSettings.revealDuration - 100) / 2900) * parent.width - (width / 2), parent.width - width))
+                                    x: Math.max(0, Math.min(((Config.lock.revealDuration - 100) / 2900) * parent.width - (width / 2), parent.width - width))
 
                                     scale: sliderMouse.pressed ? 1.3 : (sliderMouse.containsMouse ? 1.15 : 1.0)
-                                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+                                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Config.easingOf(Config.anim.emphasized) } }
                                 }
 
                                 MultiEffect {
@@ -965,7 +964,7 @@ ShellRoot {
                                     id: sliderMouse
                                     anchors.fill: parent
                                     hoverEnabled: true
-                                    enabled: !lockSettings.hidePassword
+                                    enabled: !Config.lock.hidePassword
                                     preventStealing: true
 
                                     function updateVal(mouseX) {
@@ -973,7 +972,7 @@ ShellRoot {
                                         let ms = Math.round(100 + (pct * 2900));
                                         if (ms % 100 < 10) ms -= (ms % 100);
                                         else if (ms % 100 > 90) ms += (100 - (ms % 100));
-                                        lockSettings.revealDuration = ms;
+                                        Config.lock.revealDuration = ms;
                                     }
 
                                     onPositionChanged: (mouse) => {
@@ -996,7 +995,7 @@ ShellRoot {
                         // --- SYSTEM ACTIONS SECTION ---
                         Text {
                             text: "SYSTEM"
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Config.font
                             font.weight: Font.Black
                             font.pixelSize: 12 * screenRoot.sc
                             font.letterSpacing: 1.5
@@ -1008,14 +1007,14 @@ ShellRoot {
                             Layout.fillWidth: true; Layout.preferredHeight: 48 * screenRoot.sc; Layout.leftMargin: 10 * screenRoot.sc; Layout.rightMargin: 10 * screenRoot.sc; radius: 12 * screenRoot.sc
                             color: ma1.containsMouse ? Qt.rgba(root.blue.r, root.blue.g, root.blue.b, 0.1) : "transparent"
                             scale: ma1.pressed ? 0.95 : (ma1.containsMouse ? 1.02 : 1.0)
-                            Behavior on color { ColorAnimation { duration: 200 } }
-                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                            Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                            Behavior on scale { NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                             RowLayout {
                                 anchors.fill: parent; anchors.leftMargin: 16 * screenRoot.sc; anchors.rightMargin: 16 * screenRoot.sc; spacing: 0
-                                Text { text: "󰜉"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 * screenRoot.sc; color: ma1.containsMouse ? root.blue : Qt.rgba(root.blue.r, root.blue.g, root.blue.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "󰜉"; font.family: Config.font; font.pixelSize: 18 * screenRoot.sc; color: ma1.containsMouse ? root.blue : Qt.rgba(root.blue.r, root.blue.g, root.blue.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                                 Item { Layout.fillWidth: true }
-                                Text { text: "Reboot"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma1.containsMouse ? root.blue : Qt.rgba(root.blue.r, root.blue.g, root.blue.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "Reboot"; font.family: Config.font; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma1.containsMouse ? root.blue : Qt.rgba(root.blue.r, root.blue.g, root.blue.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                             }
                             MouseArea {
                                 id: ma1; anchors.fill: parent; hoverEnabled: true;
@@ -1030,14 +1029,14 @@ ShellRoot {
                             Layout.fillWidth: true; Layout.preferredHeight: 48 * screenRoot.sc; Layout.leftMargin: 10 * screenRoot.sc; Layout.rightMargin: 10 * screenRoot.sc; radius: 12 * screenRoot.sc
                             color: ma2.containsMouse ? Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.1) : "transparent"
                             scale: ma2.pressed ? 0.95 : (ma2.containsMouse ? 1.02 : 1.0)
-                            Behavior on color { ColorAnimation { duration: 200 } }
-                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                            Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                            Behavior on scale { NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                             RowLayout {
                                 anchors.fill: parent; anchors.leftMargin: 16 * screenRoot.sc; anchors.rightMargin: 16 * screenRoot.sc; spacing: 0
-                                Text { text: "󰒲"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 * screenRoot.sc; color: ma2.containsMouse ? root.mauve : Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "󰒲"; font.family: Config.font; font.pixelSize: 18 * screenRoot.sc; color: ma2.containsMouse ? root.mauve : Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                                 Item { Layout.fillWidth: true }
-                                Text { text: "Suspend"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma2.containsMouse ? root.mauve : Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "Suspend"; font.family: Config.font; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma2.containsMouse ? root.mauve : Qt.rgba(root.mauve.r, root.mauve.g, root.mauve.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                             }
                             MouseArea {
                                 id: ma2; anchors.fill: parent; hoverEnabled: true;
@@ -1052,14 +1051,14 @@ ShellRoot {
                             Layout.fillWidth: true; Layout.preferredHeight: 48 * screenRoot.sc; Layout.leftMargin: 10 * screenRoot.sc; Layout.rightMargin: 10 * screenRoot.sc; Layout.bottomMargin: 8 * screenRoot.sc; radius: 12 * screenRoot.sc
                             color: ma3.containsMouse ? Qt.rgba(root.red.r, root.red.g, root.red.b, 0.1) : "transparent"
                             scale: ma3.pressed ? 0.95 : (ma3.containsMouse ? 1.02 : 1.0)
-                            Behavior on color { ColorAnimation { duration: 200 } }
-                            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
+                            Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                            Behavior on scale { NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                             RowLayout {
                                 anchors.fill: parent; anchors.leftMargin: 16 * screenRoot.sc; anchors.rightMargin: 16 * screenRoot.sc; spacing: 0
-                                Text { text: "󰐥"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 * screenRoot.sc; color: ma3.containsMouse ? root.red : Qt.rgba(root.red.r, root.red.g, root.red.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "󰐥"; font.family: Config.font; font.pixelSize: 18 * screenRoot.sc; color: ma3.containsMouse ? root.red : Qt.rgba(root.red.r, root.red.g, root.red.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                                 Item { Layout.fillWidth: true }
-                                Text { text: "Power Off"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma3.containsMouse ? root.red : Qt.rgba(root.red.r, root.red.g, root.red.b, 0.6); Behavior on color { ColorAnimation { duration: 200 } } }
+                                Text { text: "Power Off"; font.family: Config.font; font.pixelSize: 15 * screenRoot.sc; font.weight: Font.Medium; color: ma3.containsMouse ? root.red : Qt.rgba(root.red.r, root.red.g, root.red.b, 0.6); Behavior on color { ColorAnimation { duration: Config.anim.base } } }
                             }
                             MouseArea {
                                 id: ma3; anchors.fill: parent; hoverEnabled: true;
@@ -1093,17 +1092,17 @@ ShellRoot {
 
                     scale: powerBtnMa.pressed ? 0.9 : (powerBtnMa.containsMouse ? 1.08 : 1.0)
 
-                    Behavior on color { ColorAnimation { duration: 200 } }
-                    Behavior on border.color { ColorAnimation { duration: 200 } }
-                    Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+                    Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                    Behavior on border.color { ColorAnimation { duration: Config.anim.base } }
+                    Behavior on scale { NumberAnimation { duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.emphasized) } }
 
                     Text {
                         anchors.centerIn: parent
                         text: "󰐥"
-                        font.family: "JetBrainsMono Nerd Font"
+                        font.family: Config.font
                         font.pixelSize: 22 * screenRoot.sc
                         color: screenRoot.powerMenuOpen ? root.red : (powerBtnMa.containsMouse ? root.text : root.subtext0)
-                        Behavior on color { ColorAnimation { duration: 200 } }
+                        Behavior on color { ColorAnimation { duration: Config.anim.base } }
                     }
 
                     MouseArea {
@@ -1184,7 +1183,7 @@ ShellRoot {
                             id: introIconUnlocked
                             anchors.centerIn: parent
                             text: "󰌿"
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Config.font
                             font.pixelSize: 64 * screenRoot.sc
                             color: root.text
                             opacity: 1.0
@@ -1196,7 +1195,7 @@ ShellRoot {
                             id: introIconLocked
                             anchors.centerIn: parent
                             text: "󰌾"
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Config.font
                             font.pixelSize: 64 * screenRoot.sc
                             color: root.text
                             opacity: 0.0
@@ -1209,30 +1208,30 @@ ShellRoot {
                         id: introSequence
 
                         ParallelAnimation {
-                            NumberAnimation { target: introLockOrb; property: "scale"; from: 0.0; to: 1.0; duration: 300; easing.type: Easing.OutCubic }
-                            NumberAnimation { target: introLockOrb; property: "opacity"; from: 0.0; to: 1.0; duration: 200; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: introLockOrb; property: "scale"; from: 0.0; to: 1.0; duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) }
+                            NumberAnimation { target: introLockOrb; property: "opacity"; from: 0.0; to: 1.0; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.standard) }
 
-                            NumberAnimation { target: ring1; property: "scale"; from: 0.8; to: 1.25; duration: 250; easing.type: Easing.OutCubic }
-                            NumberAnimation { target: ring1; property: "opacity"; from: 0.6; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: ring1; property: "scale"; from: 0.8; to: 1.25; duration: 250; easing.type: Config.easingOf(Config.anim.standard) }
+                            NumberAnimation { target: ring1; property: "opacity"; from: 0.6; to: 0.0; duration: 250; easing.type: Config.easingOf(Config.anim.standard) }
 
-                            NumberAnimation { target: ring2; property: "scale"; from: 0.8; to: 1.4; duration: 300; easing.type: Easing.OutCubic }
-                            NumberAnimation { target: ring2; property: "opacity"; from: 0.4; to: 0.0; duration: 300; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: ring2; property: "scale"; from: 0.8; to: 1.4; duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) }
+                            NumberAnimation { target: ring2; property: "opacity"; from: 0.4; to: 0.0; duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) }
 
-                            NumberAnimation { target: ring3; property: "scale"; from: 0.5; to: 1.5; duration: 350; easing.type: Easing.OutCubic }
-                            NumberAnimation { target: ring3; property: "opacity"; from: 0.3; to: 0.0; duration: 350; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: ring3; property: "scale"; from: 0.5; to: 1.5; duration: 350; easing.type: Config.easingOf(Config.anim.standard) }
+                            NumberAnimation { target: ring3; property: "opacity"; from: 0.3; to: 0.0; duration: 350; easing.type: Config.easingOf(Config.anim.standard) }
 
                             SequentialAnimation {
                                 PauseAnimation { duration: 300 }
                                 ParallelAnimation {
-                                    NumberAnimation { target: introIconUnlocked; property: "scale"; from: 1.0; to: 0.5; duration: 100; easing.type: Easing.InCubic }
+                                    NumberAnimation { target: introIconUnlocked; property: "scale"; from: 1.0; to: 0.5; duration: 100; easing.type: Config.easingOf(Config.anim.exit) }
                                     NumberAnimation { target: introIconUnlocked; property: "opacity"; from: 1.0; to: 0.0; duration: 50 }
 
-                                    NumberAnimation { target: introIconLocked; property: "scale"; from: 1.6; to: 1.0; duration: 200; easing.type: Easing.OutBack }
+                                    NumberAnimation { target: introIconLocked; property: "scale"; from: 1.6; to: 1.0; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) }
                                     NumberAnimation { target: introIconLocked; property: "opacity"; from: 0.0; to: 1.0; duration: 100 }
 
                                     SequentialAnimation {
                                         NumberAnimation { target: introLockOrb; property: "anchors.verticalCenterOffset"; from: 0; to: 3 * screenRoot.sc; duration: 40; easing.type: Easing.OutQuad }
-                                        NumberAnimation { target: introLockOrb; property: "anchors.verticalCenterOffset"; from: 3 * screenRoot.sc; to: 0; duration: 120; easing.type: Easing.OutBack }
+                                        NumberAnimation { target: introLockOrb; property: "anchors.verticalCenterOffset"; from: 3 * screenRoot.sc; to: 0; duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.emphasized) }
                                     }
                                 }
                             }
@@ -1242,11 +1241,11 @@ ShellRoot {
 
                         SequentialAnimation {
                             ParallelAnimation {
-                                NumberAnimation { target: introLockOrb; property: "scale"; to: 1.8; duration: 100; easing.type: Easing.InCubic }
-                                NumberAnimation { target: introOverlay; property: "opacity"; to: 0.0; duration: 100; easing.type: Easing.InCubic }
+                                NumberAnimation { target: introLockOrb; property: "scale"; to: 1.8; duration: 100; easing.type: Config.easingOf(Config.anim.exit) }
+                                NumberAnimation { target: introOverlay; property: "opacity"; to: 0.0; duration: 100; easing.type: Config.easingOf(Config.anim.exit) }
                             }
 
-                            NumberAnimation { target: screenRoot; property: "introState"; from: 0.0; to: 1.0; duration: 100; easing.type: Easing.OutCubic }
+                            NumberAnimation { target: screenRoot; property: "introState"; from: 0.0; to: 1.0; duration: 100; easing.type: Config.easingOf(Config.anim.standard) }
                         }
 
                         PropertyAction { target: screenRoot; property: "isPlayingIntro"; value: false }

@@ -12,11 +12,11 @@ Item {
     property int armedIndex: -1
 
     readonly property var actions: [
-        { icon: "󰌾", label: "Bloquear",      command: ["loginctl", "lock-session"] },
-        { icon: "⏻", label: "Apagar",        command: ["systemctl", "poweroff"] },
-        { icon: "󰜉", label: "Reiniciar",     command: ["systemctl", "reboot"] },
-        { icon: "󰤄", label: "Suspender",     command: ["systemctl", "suspend"] },
-        { icon: "󰍃", label: "Cerrar sesión", command: ["hyprctl", "dispatch", "exit"] }
+        { icon: "󰌾", label: "Bloquear",      command: Config.power.lock },
+        { icon: "⏻", label: "Apagar",        command: Config.power.poweroff },
+        { icon: "󰜉", label: "Reiniciar",     command: Config.power.reboot },
+        { icon: "󰤄", label: "Suspender",     command: Config.power.suspend },
+        { icon: "󰍃", label: "Cerrar sesión", command: Config.power.logout }
     ]
 
     function disarm() {

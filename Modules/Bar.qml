@@ -1,13 +1,10 @@
 import Quickshell // for PanelWindow
 import QtQuick // for Text
-import Quickshell.Io
-import QtQuick.Shapes
 import qs.Widgets.Bar
 import Quickshell.Wayland
 import qs.Services
 import qs.Commons
 import qs.Widgets.General
-import Qt5Compat.GraphicalEffects
 
 Scope {
     id: scope
@@ -60,7 +57,7 @@ Scope {
                     radius: 30
 
                     // Rectangulo izquierdo
-                    LeftSide { id: leftside; radius: 10; barWindow: root; barHeight: root.height }
+                    LeftSide { id: leftside; radius: 10; barHeight: root.height }
 
                     // Rectangulo central
                     MidSide{ id: midside; barHeight: root.height }

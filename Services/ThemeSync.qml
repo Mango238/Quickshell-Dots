@@ -87,23 +87,25 @@ QtObject {
     // ─── Archivos ───────────────────────────────────────────────────────────
 
     readonly property FileView kittyFile: FileView {
-        path: root._home + "/.config/kitty/colors-quickshell.conf"
+        path: Config.themeSync.kitty
         printErrors: false
         // El watcher de kitty NO recarga archivos include (verificado con
         // centinela); SIGUSR1 sí fuerza la recarga de config en todas las
         // instancias. En onSaved (no tras setText) porque la escritura del
         // FileView es asíncrona: señalizar antes recargaría el archivo viejo.
-        onSaved: Quickshell.execDetached(["pkill", "-USR1", "-x", "kitty"])
+        onSaved: Quickshell.execDetached(Config.themeSync.reloadCmd)
         onSaveFailed: (error) => console.warn("ThemeSync: fallo escribiendo colores de kitty:", error)
     }
 
     readonly property FileView hyprFile: FileView {
-        path: root._home + "/.config/hypr/colors-quickshell.conf"
+        path: Config.themeSync.hyprland
         printErrors: false
         onSaveFailed: (error) => console.warn("ThemeSync: fallo escribiendo colores de Hyprland:", error)
     }
 
     // El template se observa: editarlo re-renderiza starship.toml al vuelo.
+    // El template en sí (starship.template.toml) no está en Config: solo su
+    // salida renderizada (starship.toml) es configurable.
     readonly property FileView starshipTemplate: FileView {
         path: root._home + "/.config/starship/starship.template.toml"
         watchChanges: true
@@ -114,7 +116,7 @@ QtObject {
     }
 
     readonly property FileView starshipOut: FileView {
-        path: root._home + "/.config/starship/starship.toml"
+        path: Config.themeSync.starship
         printErrors: false
         onSaveFailed: (error) => console.warn("ThemeSync: fallo escribiendo starship.toml:", error)
     }

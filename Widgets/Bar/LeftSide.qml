@@ -5,10 +5,9 @@ import qs.Commons
 Rectangle {
     id: leftSide
 
-    // Antes estos valores llegaban por resolución dinámica del id `root` de
+    // Antes este valor llegaba por resolución dinámica del id `root` de
     // Modules/Bar.qml a través de la cadena de contextos — funcionaba, pero
-    // se rompe con ComponentBehavior: Bound. Ahora se pasan explícitos.
-    required property var barWindow
+    // se rompe con ComponentBehavior: Bound. Ahora se pasa explícito.
     required property real barHeight
 
     anchors.left: parent.left
@@ -23,8 +22,8 @@ Rectangle {
 
     width: row.width + 20
     height: leftSide.barHeight
-    Component { id: componenteHola; Pipewire { barWindow: leftSide.barWindow; barHeight: leftSide.barHeight } }
-    Component { id: componenteAdios; Battery { barWindow: leftSide.barWindow; barHeight: leftSide.barHeight } }
+    Component { id: componenteHola; Pipewire { barHeight: leftSide.barHeight } }
+    Component { id: componenteAdios; Battery { barHeight: leftSide.barHeight } }
     Component { id: componenteEstado; Red {} } 
     Component { id: hello; Cpu {} }
     

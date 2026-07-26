@@ -25,7 +25,7 @@ Rectangle {
         opacity: active ? 1.0 : 0.0
 
         Behavior on opacity {
-            NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: Config.anim.panel; easing.type: Config.easingOf(Config.anim.standard) }
         }
     }
     Text {

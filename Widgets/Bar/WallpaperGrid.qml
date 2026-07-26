@@ -206,7 +206,7 @@ Item {
                     onClicked: {
                         var idx = transitionPill.cycle.indexOf(WallpaperService.transitionType)
                         var next = transitionPill.cycle[(idx + 1) % transitionPill.cycle.length]
-                        WallpaperService.transitionType = next
+                        Config.wallpaper.wallAnim = next
                     }
                 }
             }

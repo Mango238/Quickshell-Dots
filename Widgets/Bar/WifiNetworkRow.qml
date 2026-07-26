@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Networking
+import qs.Commons
 import qs.Services
 
 /**
@@ -39,7 +40,7 @@ Item {
     readonly property bool busy: network && network.stateChanging
 
     height: expanded ? 92 : 56
-    Behavior on height { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+    Behavior on height { NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) } }
 
     function _startPasswordConnect() {
         row.errorText = ""

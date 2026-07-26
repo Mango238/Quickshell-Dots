@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Bluetooth
+import qs.Commons
 
 /**
  * BluetoothDeviceList.qml — Selector de dispositivos Bluetooth
@@ -129,7 +130,7 @@ Item {
                     color: "#FFFFFF"
                     y: 3
                     x: (root.adapterReady && root.adapter.enabled) ? parent.width - width - 3 : 3
-                    Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                    Behavior on x { NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) } }
                 }
 
                 MouseArea {
@@ -177,7 +178,7 @@ Item {
             clip: true
             spacing: 6
             
-            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) } }
 
 
             opacity: root.adapterReady && root.adapter.enabled ? 1 : 0

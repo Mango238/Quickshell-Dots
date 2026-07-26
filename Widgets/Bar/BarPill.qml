@@ -40,8 +40,8 @@ Rectangle {
     border.color: pill.hovered ? Qt.lighter(Colors.palette[8], 1.15) : Colors.palette[8]
     border.width: 1
 
-    Behavior on color { ColorAnimation { duration: 120 } }
-    Behavior on border.color { ColorAnimation { duration: 120 } }
+    Behavior on color { ColorAnimation { duration: Config.anim.instant } }
+    Behavior on border.color { ColorAnimation { duration: Config.anim.instant } }
     Behavior on width {
         NumberAnimation { duration: 100 }
     }

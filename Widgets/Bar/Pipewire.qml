@@ -6,9 +6,8 @@ import qs.Commons
 WrapperMouseArea {
     id: main
 
-    // Ventana y altura de la barra pasadas explícitas desde el Component de
-    // LeftSide.qml (antes llegaban por resolución dinámica del id `root`).
-    required property var barWindow
+    // Altura de la barra pasada explícita desde el Component de LeftSide.qml
+    // (antes llegaba por resolución dinámica del id `root`).
     required property real barHeight
 
     hoverEnabled: true
@@ -56,7 +55,6 @@ WrapperMouseArea {
     HoverPopup {
         id: hoverPopup
         triggerItem:  main
-        anchorWindow: main.barWindow
         popupWidth:   200
         popupHeight:  200
         offsetY: main.barHeight - 2

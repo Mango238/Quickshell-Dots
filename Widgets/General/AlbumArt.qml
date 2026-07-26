@@ -7,13 +7,12 @@ Item {
     id: main
 
     property MprisPlayer activePlayer: {
-        // Busca Spotify (cliente oficial), luego Spotifyd (daemon
-        // ligero via Spotify Connect), o el primer player disponible
-        for (const p of Mpris.players.values) {
-            if (p.identity === "Spotify") return p;
-        }
-        for (const p of Mpris.players.values) {
-            if (p.identity === "Spotifyd") return p;
+        // Recorre Config.players en orden de preferencia (Spotify, luego
+        // Spotifyd por defecto), o el primer player disponible.
+        for (const name of Config.players) {
+            for (const p of Mpris.players.values) {
+                if (p.identity === name) return p;
+            }
         }
         return Mpris.players.values[0] ?? null;
     }

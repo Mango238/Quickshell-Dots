@@ -25,16 +25,17 @@ QtObject {
     // ─── Configuración ──────────────────────────────────────────────────────
 
     /// Carpeta a escanear. Por defecto ~/Imágenes/archlinux-favorite-wallpapers/.
-    property string wallpaperDir: Quickshell.env("HOME") + "/Imágenes/archlinux-favorite-wallpapers/"
-    
-    property string stateFilePath: "/tmp/actual_wallpaper.txt"
+    property string wallpaperDir: Config.wallpaper.dir
+    onWallpaperDirChanged: root.scan()
+
+    property string stateFilePath: Config.wallpaper.stateFile
 
     /// Extensiones consideradas como wallpaper válido.
     property var extensions: ["jpg", "jpeg", "png", "webp", "bmp"]
 
     /// Opciones de transición de awww. Ver `awww img --help` para más tipos
     /// (grow, wipe, wave, outer, random, none, etc.).
-    property string transitionType: "grow"
+    property string transitionType: Config.wallpaper.wallAnim
     property real transitionDuration: 0.6
     property int transitionFps: 60
 
@@ -446,7 +447,7 @@ QtObject {
     }
 
     readonly property Process queryProc: Process {
-        command: ["awww", "query"]
+        command: [Config.wallpaper.backend, "query"]
         stdout: StdioCollector {
             onStreamFinished: {
                 // FIX: `awww query` imprime una línea por monitor. Antes
@@ -491,7 +492,7 @@ QtObject {
 
     function buildApplyCommand(path) {
         return [
-            "awww", "img", path,
+            Config.wallpaper.backend, "img", path,
             "--transition-type", root.transitionType,
             "--transition-duration", String(root.transitionDuration),
             "--transition-fps", String(root.transitionFps)
@@ -526,7 +527,7 @@ QtObject {
             // 700ms de latencia a errores que nunca se iban a resolver.
             if (!root._retriedOnce && root._looksLikeDaemonMissing(stderrText)) {
                 root._retriedOnce = true
-                Quickshell.execDetached(["awww-daemon"])
+                Quickshell.execDetached([Config.wallpaper.backend + "-daemon"])
                 retryTimer.start()
             } else {
                 root.applying = false

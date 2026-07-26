@@ -16,6 +16,15 @@ ShellRoot {
         onPressed: PopupState.toggle("wallpaper")
     }
 
+    // Togglea la barra lateral (Obsidian / Claude Code). El lado Hyprland es
+    // `bind = $mainMod, A, global, quickshell:sidebarToggle`.
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "sidebarToggle"
+        description: "Toggle de la barra lateral"
+        onPressed: SidebarState.toggle()
+    }
+
     // Activa el singleton ThemeSync (perezoso): propaga Colors.palette a
     // kitty/Hyprland/starship en cada cambio de wallpaper.
     property var _themeSync: ThemeSync
@@ -32,6 +41,7 @@ ShellRoot {
                 ClockWidget  {}
                 Equalizer {}
                 NotificationToast {}
+                Sidebar {}
             }
         }
     }

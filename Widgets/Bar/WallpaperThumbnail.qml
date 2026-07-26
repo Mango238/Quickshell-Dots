@@ -55,7 +55,7 @@ Item {
             transformOrigin: Item.Center
             scale: root.hovered ? 1.06 : 1.0
             Behavior on scale {
-                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) }
             }
         }
 
@@ -97,7 +97,7 @@ Item {
             height: parent.height * 0.4
             opacity: root.hovered ? 1.0 : 0.0
             Behavior on opacity {
-                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) }
             }
 
             gradient: Gradient {
@@ -126,10 +126,10 @@ Item {
             border.color: root.selected ? root.accentColor : root.textColor
 
             Behavior on border.width {
-                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) }
             }
             Behavior on border.color {
-                ColorAnimation { duration: 120 }
+                ColorAnimation { duration: Config.anim.instant }
             }
         }
 

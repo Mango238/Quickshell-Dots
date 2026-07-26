@@ -1,9 +1,5 @@
 # Agente Quickshell — configuración y creación de módulos (Arch Linux)
 
-> Copia operativa del diseño de agente en `~/Claude/quickshell-agent/CLAUDE.md`, ubicada
-> acá porque este SÍ es el directorio de trabajo real (`~/Claude/quickshell-agent` es solo
-> el proyecto de diseño/documentación del agente, nunca el target de una edición).
-
 - **Objetivo:** agente que crea, edita y depura módulos QML y la configuración de
   [Quickshell](https://quickshell.outfoxxed.me) (shell de Wayland basado en QtQuick/QML de
   outfoxxed, usado típicamente con Hyprland o Niri) sobre Arch Linux, gestionando también el
@@ -25,37 +21,32 @@
 - **Caching:** system prompt + las 8 tools (orden fijo alfabético) congelados con
   `cache_control` al final del bloque de system; nada volátil ahí (sin timestamps ni IDs de
   sesión) — lo volátil va en `messages`.
+- **Dos capas.** Este archivo es a la vez (a) el diseño de un agente *standalone* para la API
+  de Anthropic —el system prompt XML, las 8 tools JSON y la llamada `messages.create` de más
+  abajo—, y (b) el `CLAUDE.md` que gobierna las sesiones de **Claude Code** en este directorio.
+  Los plugins instalados (skills + MCP) solo existen en la capa Claude Code: su uso se describe
+  en la sección `## Plugins de Claude Code` y **no** forma parte del system prompt del agente
+  API (meterlos ahí lo rompería como diseño de API — esas skills no existen en la API — y
+  además invalidaría su caché).
 
 ---
 
 ## graphify
 
-Este directorio (la config real de Quickshell en uso) tiene un grafo de conocimiento completo
-en `graphify-out/`: **101 nodos, 166 relaciones, 23 comunidades**. Cubre tanto el código AST
-(Rust del widget de CPU, scripts de shell) como los 58 módulos `.qml` reales (Commons,
-Modules, Services, Widgets, shell.qml, Lock.qml), extraídos semánticamente porque graphify no
-tiene gramática AST para QML.
+Este proyecto tiene un grafo de conocimiento en `graphify-out/` (god nodes, estructura de
+comunidades, relaciones cross-file).
 
 Reglas:
-- **Al empezar cualquier sesión nueva en este directorio**, leé `graphify-out/GRAPH_REPORT.md`
-  (God Nodes, Surprising Connections, Comunidades) como contexto inicial, antes de explorar el
-  código a mano.
-- Para cualquier pregunta sobre el código, corré primero `graphify query "<pregunta>"` cuando
-  exista `graphify-out/graph.json`. Usá `graphify path "<A>" "<B>"` para relaciones puntuales
-  y `graphify explain "<concepto>"` para un nodo concreto. Devuelven un subgrafo acotado,
-  normalmente mucho más chico que grepear el código a mano.
-- Si existe `graphify-out/wiki/index.md`, usalo para navegación amplia en vez de explorar el
+- Para preguntas sobre el código, corre primero `graphify query "<pregunta>"` cuando exista
+  `graphify-out/graph.json`. Usa `graphify path "<A>" "<B>"` para relaciones y
+  `graphify explain "<concepto>"` para conceptos puntuales. Devuelven un subgrafo acotado,
+  normalmente mucho más pequeño que GRAPH_REPORT.md o un grep crudo.
+- Si existe `graphify-out/wiki/index.md`, úsalo para navegación amplia en vez de explorar el
   código fuente a mano.
-- Leé `graphify-out/GRAPH_REPORT.md` completo solo para revisión de arquitectura amplia o
-  cuando query/path/explain no den suficiente contexto.
-
-**Limitación conocida — `.qml` y `--update`:** `graphify` clasifica `.qml` como
-"unclassified" por defecto (no está en su lista de extensiones de código ni de documento),
-así que un `graphify <path> --update` normal **no va a re-extraer los módulos QML
-modificados** — silenciosamente los va a seguir ignorando. Tras modificar o crear archivos
-`.qml`, para mantener el grafo al día hay que repetir el workaround: reclasificar los `.qml`
-nuevos/modificados como `document` en el detect JSON antes de correr la extracción semántica.
-No asumas que `--update` sola alcanza para cambios en QML.
+- Lee `graphify-out/GRAPH_REPORT.md` solo para revisión de arquitectura amplia o cuando
+  query/path/explain no den suficiente contexto.
+- Tras modificar código, corre `graphify update .` para mantener el grafo al día (solo AST,
+  sin costo de API).
 
 ---
 

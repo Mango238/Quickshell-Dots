@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import qs.Commons
 import qs.Services
 
 /**
@@ -102,7 +103,7 @@ Item {
                     color: "#FFFFFF"
                     y: 3
                     x: WifiService.enabled ? parent.width - width - 3 : 3
-                    Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                    Behavior on x { NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) } }
                 }
 
                 MouseArea {
@@ -159,7 +160,7 @@ Item {
             clip: true
             spacing: 6
 
-            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) } }
             opacity: root.deviceReady && WifiService.enabled ? 1 : 0
             visible: opacity ? true : false
 
