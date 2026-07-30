@@ -200,6 +200,62 @@ Singleton {
         return mixColors(fg, target, hi);
     }
 
+    // Normaliza a un valor `color`: extrapolateAndSort devuelve strings hex y
+    // ColorQuantizer devuelve `color`. Ambos entran a pickVivid.
+    function _asColor(c) { return (typeof c === "string") ? Qt.color(c) : c }
+
+    // Devuelve `c` re-nivelado al value HSV `v`, conservando su tono y su
+    // saturación (esta última acotada por maxSat si se pasa).
+    //
+    // Sirve para fabricar un fondo tintado por el álbum. Elegir el fondo por
+    // índice en la rampa de extrapolateAndSort no funciona: la rampa ordena por
+    // luminancia, así que en portadas con mucho negro (Born Slippy, Invaders
+    // Must Die) los índices bajos colapsan TODOS a negro puro y el panel queda
+    // apagado, sin relación con el color dominante de la portada.
+    function atValue(c, v, maxSat) {
+        var q = _asColor(c)
+        var s = q.hsvSaturation
+        if (maxSat !== undefined) s = Math.min(s, maxSat)
+        // Gris: no hay tono que conservar (hsvHue es -1 en colores acromáticos).
+        if (q.hsvHue < 0 || s < 0.05) return Qt.hsva(0, 0, v, 1)
+        return Qt.hsva(q.hsvHue, s, v, 1)
+    }
+
+    // Elige el color que MÁS RESALTA de `pal` contra el fondo `bg`: de entre los
+    // que ya contrastan (ratio >= minRatio), el de mayor viveza (saturación ×
+    // valor HSV). Los casi-negros y casi-blancos se descartan: aportan viveza ~0
+    // y arruinan el score.
+    //
+    // Existe porque la posición en la rampa de extrapolateAndSort NO dice nada
+    // sobre qué color destaca: esa rampa intercala puntos medios interpolados
+    // (grises por construcción) y ordena por luminancia. Medido sobre 24 portadas
+    // reales, su índice 4 salía apagado (saturación < 0.35) en 14.
+    //
+    // Si ninguno contrasta lo suficiente, aclara/oscurece el más vivo con
+    // adjustForContrast (conserva el tono). Si la portada es monocroma (nada
+    // supera minVivid), cae al fallback ajustado.
+    function pickVivid(pal, bg, fallback, minRatio, minVivid) {
+        minRatio = minRatio || 2.2
+        minVivid = minVivid || 0.12
+        if (!pal || pal.length === 0)
+            return adjustForContrast(fallback, bg, minRatio)
+
+        var best = null, bestV = -1    // el más vivo, contraste aparte
+        var vis  = null, visV  = -1    // el más vivo que ADEMÁS contrasta
+
+        for (var i = 0; i < pal.length; i++) {
+            var q = _asColor(pal[i])
+            if (q.hsvValue < 0.18 || q.hsvValue > 0.97) continue
+            var v = q.hsvSaturation * q.hsvValue
+            if (v > bestV) { bestV = v; best = pal[i] }
+            if (v > visV && getContrastRatio(pal[i], bg) >= minRatio) { visV = v; vis = pal[i] }
+        }
+
+        if (vis  !== null && visV  >= minVivid) return vis
+        if (best !== null && bestV >= minVivid) return adjustForContrast(best, bg, minRatio)
+        return adjustForContrast(fallback, bg, minRatio)
+    }
+
     // Función extra muy útil: Elige automáticamente texto blanco o negro según el fondo
     function getReadableTextColor(bgColor) {
         var contrastWithWhite = getContrastRatio(bgColor, "#FFFFFF");

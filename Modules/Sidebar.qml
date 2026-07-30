@@ -41,7 +41,12 @@ Scope {
                 }
 
                 anchors { top: true; bottom: true; left: true }
-                implicitWidth: 440
+                // Editar una nota en 440px es incómodo: el panel se ensancha
+                // mientras el editor está abierto.
+                implicitWidth: (SidebarState.activeView === "obsidian" && ObsidianEditor.path !== "") ? 720 : 440
+                Behavior on implicitWidth {
+                    NumberAnimation { duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.standard) }
+                }
                 margins { top: 6; bottom: 6; left: 6 }
 
                 visible: win.open || slideAnim.running
@@ -50,7 +55,14 @@ Scope {
                 // cuando el compositor limpia el grab; Qt.callLater da un tick
                 // para que la ventana se muestre antes de pedirlo (mismo patrón
                 // que PanelPopup.qml).
-                onOpenChanged: Qt.callLater(() => grab.active = win.open)
+                // Autoguardado: al cerrar el sidebar el Loader destruye la
+                // vista, así que la nota se escribe acá. save() es no-op si no
+                // hay cambios, da igual que se dispare una vez por monitor.
+                onOpenChanged: {
+                    if (!win.open)
+                        ObsidianEditor.save()
+                    Qt.callLater(() => grab.active = win.open)
+                }
 
                 HyprlandFocusGrab {
                     id: grab
@@ -140,10 +152,12 @@ Scope {
                         active: win.open
                         sourceComponent: SidebarState.activeView === "claude" ? claudeComp
                                        : SidebarState.activeView === "config" ? settingsComp
+                                       : ObsidianEditor.path !== "" ? noteEditorComp
                                        : obsidianComp
                     }
 
                     Component { id: obsidianComp; ObsidianView { anchors.fill: parent } }
+                    Component { id: noteEditorComp; NoteEditor { anchors.fill: parent } }
                     Component { id: claudeComp;   ClaudeCodeView { anchors.fill: parent } }
                     Component { id: settingsComp; SettingsView { anchors.fill: parent } }
                 }

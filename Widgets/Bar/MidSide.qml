@@ -229,7 +229,9 @@ Row {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            Hyprland.dispatch(`workspace ${modelData.id}`)
+                            // Config Lua: `dispatch` evalúa el argumento como
+                            // expresión Lua, la sintaxis vieja ("workspace N") ya no existe.
+                            Hyprland.dispatch(`hl.dsp.focus({workspace = ${modelData.id}})`)
                         }
                     }
                 }

@@ -10,8 +10,8 @@ import qs.Commons
  *
  *   - kitty:    ~/.config/kitty/colors-quickshell.conf   (include en kitty.conf;
  *               el watcher de kitty recarga en vivo las ventanas abiertas)
- *   - Hyprland: ~/.config/hypr/colors-quickshell.conf    (source en hyprland.conf;
- *               Hyprland recarga solo al cambiar un archivo sourced)
+ *   - Hyprland: ~/.config/hypr/colors-quickshell.lua     (módulo Lua que
+ *               hyprland.lua carga con dofile; requiere `hyprctl reload`)
  *   - starship: renderiza ~/.config/starship/starship.template.toml →
  *               starship.toml reemplazando los tokens TSCFW10..15 (el sistema
  *               de templates que ya usaba el pipeline Python retirado);
@@ -63,16 +63,16 @@ QtObject {
             + "selection_foreground " + _hex(0) + "\n"
     }
 
+    // Módulo Lua: la config de Hyprland lo carga con dofile() y lee
+    // `border_active`. Los $qsPalette0..9 y $qsAccent que emitía la versión
+    // hyprlang no los leía nadie, así que ya no se generan.
     function _hyprContent() {
-        var out = root.header
-        for (var i = 0; i < 10; i++)
-            out += "$qsPalette" + i + " = rgb(" + _raw(i) + ")\n"
-        out += "$qsAccent = rgb(" + String(Colors.accent).slice(1) + ")\n"
         // Mismos stops que el borde activo histórico (TSCFW14ee/13aa/12aa)
-        out += "$qsBorderActive1 = rgba(" + _raw(6) + "ee)\n"
-        out += "$qsBorderActive2 = rgba(" + _raw(5) + "aa)\n"
-        out += "$qsBorderActive3 = rgba(" + _raw(4) + "aa)\n"
-        return out
+        return "-- Generado por Quickshell (Services/ThemeSync.qml) desde el wallpaper actual.\n"
+            + "-- NO editar a mano: se reescribe en cada cambio de wallpaper.\n"
+            + "return {\n"
+            + "    border_active = { \"rgba(" + _raw(6) + "ee)\", \"rgba(" + _raw(5) + "aa)\", \"rgba(" + _raw(4) + "aa)\" },\n"
+            + "}\n"
     }
 
     function _starshipContent(templateText) {
@@ -100,6 +100,13 @@ QtObject {
     readonly property FileView hyprFile: FileView {
         path: Config.themeSync.hyprland
         printErrors: false
+        // Con la config en hyprlang, Hyprland vigilaba los archivos `source`d y
+        // recargaba solo. La config Lua carga este módulo con dofile() y no lo
+        // vigila, así que hay que disparar la recarga a mano. En onSaved por lo
+        // mismo que kittyFile: la escritura del FileView es asíncrona.
+        // `config-only`: un reload pelado re-aplica también los monitores, y esto
+        // corre en cada cambio de wallpaper.
+        onSaved: Quickshell.execDetached(["hyprctl", "reload", "config-only"])
         onSaveFailed: (error) => console.warn("ThemeSync: fallo escribiendo colores de Hyprland:", error)
     }
 

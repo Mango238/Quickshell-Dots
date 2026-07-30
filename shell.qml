@@ -25,6 +25,15 @@ ShellRoot {
         onPressed: SidebarState.toggle()
     }
 
+    // Togglea el patchbay de PipeWire. El lado Hyprland es
+    // `bind = $mainMod, P, global, quickshell:patchbayToggle`.
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "patchbayToggle"
+        description: "Toggle del patchbay de PipeWire"
+        onPressed: PopupState.toggle("patchbay")
+    }
+
     // Activa el singleton ThemeSync (perezoso): propaga Colors.palette a
     // kitty/Hyprland/starship en cada cambio de wallpaper.
     property var _themeSync: ThemeSync
@@ -40,6 +49,7 @@ ShellRoot {
                 Bar          {}
                 ClockWidget  {}
                 Equalizer {}
+                Patchbay {}
                 NotificationToast {}
                 Sidebar {}
             }

@@ -36,6 +36,9 @@ Rectangle {
             height: 20
             anchors.verticalCenter: parent.verticalCenter
         }
+        PatchbayActivate {
+            anchors.verticalCenter: parent.verticalCenter
+        }
         Repeater {
             id: miRepeater
             model: [spoti ,componenteAdios, barClock, notifBell, powerOff]

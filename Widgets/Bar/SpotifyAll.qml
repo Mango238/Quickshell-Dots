@@ -12,9 +12,9 @@ Item {
     property var player: SpotifyInfo.activePlayer
     property var trackData: SpotifyInfo.trackData
 
-    readonly property var pal: SpotifyInfo.albumPalette
-    readonly property color textColor: OrderColors.getReadableTextColor(pal[4])
-    property color accent: pal[8]
+    // Legibilidad contra el fondo REAL del panel (Bar.qml lo pinta con albumBg).
+    readonly property color textColor: OrderColors.getReadableTextColor(SpotifyInfo.albumBg)
+    property color accent: SpotifyInfo.albumAccent
 
     // Mpris no reevalúa los bindings de position por sí solo: hay que
     // emitir positionChanged() periódicamente mientras reproduce.
@@ -73,7 +73,7 @@ Item {
                 width: parent.width
                 height: width
                 z: 0
-                accentColor: Colors.ensureReadable(pal[5], accent, 2.5)
+                accentColor: spotAll.accent
             }
 
             ClippingRectangle {

@@ -68,7 +68,10 @@ Singleton {
             id: artCollector
             onStreamFinished: {
                 const path = artCollector.text.trim()
-                if (path !== "")
+                // La descarga es asíncrona: al saltar de track rápido, el curl en
+                // vuelo del track anterior puede terminar después de que _artUrl ya
+                // cambió, y pisaría artFile con la portada vieja.
+                if (path !== "" && artFetcher.url === singleton._artUrl)
                     singleton.artFile = "file://" + path
             }
         }
@@ -81,7 +84,9 @@ Singleton {
         source: singleton.artFile !== ""
             ? singleton.artFile
             : Qt.resolvedUrl("../Assets/No_cover.jpg")
-        depth: 3
+        // depth 4 = 16 colores (2^n). Con 8 un color vivo de poca superficie se
+        // diluía en el promedio de su bucket del median cut.
+        depth: 4
         rescaleSize: 512
     }
 
@@ -90,6 +95,16 @@ Singleton {
          && albumQuantizer.colors.length > 0)
             ? OrderColors.extrapolateAndSort(albumQuantizer.colors, 10)
             : Colors.palette
+
+    readonly property color albumBg: OrderColors.atValue(albumPalette[5], 0.42, 0.55) // color, 0.22, 0.55
+
+    readonly property color albumBgDeep: OrderColors.atValue(albumPalette[1], 0.22, 0.55) // color, 0.12, 0.55
+
+    readonly property color albumAccent:
+        (artFile !== "" && albumQuantizer.colors
+         && albumQuantizer.colors.length > 0)
+            ? OrderColors.pickVivid(albumQuantizer.colors, albumBg, Colors.accent)
+            : Colors.accent
 
     // Segundos → "m:ss" para las etiquetas de progreso
     function formatTime(secs) {

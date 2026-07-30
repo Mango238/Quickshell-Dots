@@ -8,6 +8,7 @@ import Quickshell.Wayland
 import Quickshell.Services.Pam
 import qs.Commons
 import qs.Services
+import qs.Widgets.Lock
 
 ShellRoot {
     id: root
@@ -38,13 +39,56 @@ ShellRoot {
         property bool failed: false
         property bool authenticating: false
         property string statusText: "Locked"
+        // Intentos de huella ya consumidos (tope en fpTimer).
+        property int fpTries: 0
+        // Estado de la huella, separado de statusText: los dos caminos ya no se pelean por
+        // el mismo label (statusText es solo del camino de contraseña).
+        property string fpStatus: ""
+        readonly property bool fpDone: fpTries >= 5
+        // WlSessionLockSurface se instancia por monitor, asi que el scope raiz no alcanza los
+        // ids de su interior: los flashes del indicador viajan por signal.
+        signal fpFail()
+        signal fpSuccess()
+        // Dispara el outro de desbloqueo en cada surface.
+        signal unlockRequested()
     }
 
-    // Timer to safely decouple PAM execution from the main QML event loop
+    // Desbloqueo: primero el outro, despues soltar el lock. El compositor retira la surface en
+    // cuanto locked pasa a false, asi que sin esta espera la animacion no se veria nunca.
+    // El tiempo lo manda este timer y NO el onFinished del outro: si un monitor no renderiza su
+    // animacion podria no avanzar, y eso dejaria la sesion bloqueada. Mantener en sync con
+    // outroSequence (medido: 650 ms de punta a punta, con margen para no cortar el fundido
+    // final: con 590 ms la surface desaparecia con el overlay aun a media opacidad).
+    Timer {
+        id: unlockTimer
+        interval: 680
+        onTriggered: {
+            rootLock.locked = false;
+            exitTimer.start();
+        }
+    }
+
+    function releaseLock() {
+        lockUI.unlockRequested();
+        unlockTimer.start();
+    }
+
+    // Timer to safely decouple PAM execution from the main QML event loop.
+    // Solo para el contexto de contraseña: tambien se reusa para reiniciarlo tras un fallo,
+    // y arrancar un PamContext que ya esta activo es un error.
     Timer {
         id: pamActionTimer
         interval: 50
         onTriggered: pam.start()
+    }
+
+    // Reintento del contexto de huella, separado del de contraseña.
+    // ponytail: tope de 5 intentos con 1 s de espera para no spamear si pam_fprintd falla al
+    // instante (p. ej. sensor suspendido tras un resume). Ajustar segun el lector real.
+    Timer {
+        id: fpTimer
+        interval: 1000
+        onTriggered: if (!pamFp.active && lockUI.fpTries < 5) pamFp.start()
     }
 
     // Autotermina el proceso tras liberar el lock. Quickshell 0.3.0 no expone quit/exit y
@@ -59,9 +103,12 @@ ShellRoot {
         onTriggered: Quickshell.execDetached(["pkill", "-f", "quickshell/Lock.qml"])
     }
 
-    // System Authentication hook
+    // System Authentication hook (contraseña).
+    // Servicio PAM propio (/etc/pam.d/quickshell-lock, sin pam_fprintd) para que la huella no
+    // bloquee el tecleo: la huella va en paralelo en pamFp, con su propio servicio PAM.
     PamContext {
         id: pam
+        config: "quickshell-lock"
 
         // Defer start until after component initialization to prevent memory segfaults
         Component.onCompleted: pamActionTimer.start()
@@ -69,16 +116,47 @@ ShellRoot {
         onCompleted: (result) => {
             lockUI.authenticating = false;
             if (result === PamResult.Success) {
+                if (pamFp.active) pamFp.abort();   // libera el sensor antes de morir
                 // Liberar el lock ANTES de morir: si el proceso sale con locked=true, un
                 // compositor conforme deja la pantalla bloqueada (doc de WlSessionLock).
-                rootLock.locked = false;
-                exitTimer.start();
+                root.releaseLock();
             } else {
                 lockUI.failed = true;
                 lockUI.statusText = "Access Denied";
                 // Defer the restart to prevent a recursive crash loop
                 pamActionTimer.start();
             }
+        }
+    }
+
+    // Autenticacion por huella, en paralelo al contexto de contraseña: desbloquea el primero
+    // de los dos que devuelva Success. /etc/pam.d/quickshell-lock-fp solo lleva pam_fprintd,
+    // asi que este contexto nunca pide contraseña ni pasa por faillock (fallar el dedo no
+    // bloquea la cuenta).
+    // NO escribe lockUI.authenticating ni lockUI.failed: el onAccepted del campo de texto
+    // exige !authenticating para aceptar la contraseña, y el rojo/shake es del camino de
+    // contraseña. Si la huella tocara esos flags romperia justo el paralelismo que busca.
+    PamContext {
+        id: pamFp
+        config: "quickshell-lock-fp"
+
+        Component.onCompleted: fpTimer.start()
+
+        // pam_fprintd manda su prompt como mensaje informativo ("Place your finger on...").
+        onPamMessage: if (message !== "") lockUI.fpStatus = message;
+
+        onCompleted: (result) => {
+            if (result === PamResult.Success) {
+                if (pam.active) pam.abort();
+                lockUI.fpStatus = "Welcome back";
+                lockUI.fpSuccess();
+                root.releaseLock();
+                return;
+            }
+            lockUI.fpTries++;
+            lockUI.fpStatus = lockUI.fpDone ? "" : "Fingerprint not recognized";
+            lockUI.fpFail();
+            fpTimer.start();
         }
     }
 
@@ -330,6 +408,36 @@ ShellRoot {
                     anchors.fill: parent
                     opacity: screenRoot.introState
                     transform: Translate { y: (30 * screenRoot.sc) * (1.0 - screenRoot.introState) }
+
+                    // --- FINGERPRINT INDICATOR ---
+                    // Centrado bajo el reloj y bajo el modulo de auth (que ocupa hasta ~+45*sc),
+                    // asi que es el unico indicador y se ve en los dos estados.
+                    FingerprintIndicator {
+                        id: fpIndicator
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        // Anclado por arriba, no por el centro: el label crece a dos lineas con
+                        // los prompts largos de pam_fprintd y el badge no debe saltar por eso.
+                        anchors.top: parent.verticalCenter
+                        anchors.topMargin: (screenRoot.inputActive ? 140 : 160) * screenRoot.sc
+                        Behavior on anchors.topMargin { NumberAnimation { duration: Config.anim.slow; easing.type: Config.easingOf(Config.anim.decelerate) } }
+
+                        sc: screenRoot.sc
+                        armed: pamFp.active
+                        exhausted: lockUI.fpDone
+                        statusText: lockUI.fpStatus
+
+                        onRetryRequested: {
+                            lockUI.fpTries = 0;
+                            lockUI.fpStatus = "";
+                            fpTimer.start();
+                        }
+
+                        Connections {
+                            target: lockUI
+                            function onFpFail() { fpIndicator.flashFail(); }
+                            function onFpSuccess() { fpIndicator.flashSuccess(); }
+                        }
+                    }
 
                     // --- CLOCK MODULE (Idle State) ---
                     ColumnLayout {
@@ -1250,6 +1358,65 @@ ShellRoot {
 
                         PropertyAction { target: screenRoot; property: "isPlayingIntro"; value: false }
                         ScriptAction { script: { inputField.text = ""; inputField.forceActiveFocus(); } }
+                    }
+
+                    // --- OUTRO: el mismo orbe del intro, ahora abriendose ---
+                    // Reusa introLockOrb, sus dos glifos y los tres anillos: la salida es el
+                    // intro al reves, y no hay items nuevos que mantener.
+                    // Todos los tramos fijan `from` explicito para no depender del estado en que
+                    // quedaron tras el intro (o de un intro cortado a medias).
+                    // Duracion total medida ~650 ms: mantener en sync con unlockTimer.
+                    SequentialAnimation {
+                        id: outroSequence
+
+                        // 1. El contenido se va y el orbe vuelve del 1.8 en que lo dejo el intro.
+                        ParallelAnimation {
+                            NumberAnimation { target: screenRoot; property: "introState"; to: 0.0; duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.exit) }
+                            NumberAnimation { target: introOverlay; property: "opacity"; from: 0.0; to: 1.0; duration: Config.anim.instant }
+                            NumberAnimation { target: introLockOrb; property: "opacity"; to: 1.0; duration: Config.anim.instant }
+                            NumberAnimation { target: introLockOrb; property: "scale"; from: 1.8; to: 1.0; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) }
+                        }
+
+                        // 2. El candado se abre y los anillos salen hacia afuera.
+                        ParallelAnimation {
+                            NumberAnimation { target: introIconLocked; property: "opacity"; from: 1.0; to: 0.0; duration: 50 }
+                            NumberAnimation { target: introIconLocked; property: "scale"; from: 1.0; to: 1.5; duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.exit) }
+
+                            NumberAnimation { target: introIconUnlocked; property: "opacity"; from: 0.0; to: 1.0; duration: 100 }
+                            NumberAnimation { target: introIconUnlocked; property: "scale"; from: 0.5; to: 1.0; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.emphasized) }
+
+                            SequentialAnimation {
+                                NumberAnimation { target: introLockOrb; property: "anchors.verticalCenterOffset"; from: 0; to: -4 * screenRoot.sc; duration: 40; easing.type: Easing.OutQuad }
+                                NumberAnimation { target: introLockOrb; property: "anchors.verticalCenterOffset"; from: -4 * screenRoot.sc; to: 0; duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.emphasized) }
+                            }
+
+                            NumberAnimation { target: ring1; property: "scale"; from: 0.9; to: 1.6; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.decelerate) }
+                            NumberAnimation { target: ring1; property: "opacity"; from: 0.6; to: 0.0; duration: Config.anim.base }
+
+                            NumberAnimation { target: ring2; property: "scale"; from: 0.9; to: 1.8; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.decelerate) }
+                            NumberAnimation { target: ring2; property: "opacity"; from: 0.4; to: 0.0; duration: Config.anim.base }
+
+                            NumberAnimation { target: ring3; property: "scale"; from: 0.9; to: 2.0; duration: Config.anim.base; easing.type: Config.easingOf(Config.anim.decelerate) }
+                            NumberAnimation { target: ring3; property: "opacity"; from: 0.35; to: 0.0; duration: Config.anim.base }
+                        }
+
+                        // Un beat con el candado abierto: sin esto la apertura duraba ~150 ms y el
+                        // fundido se la comia.
+                        PauseAnimation { duration: Config.anim.instant }
+
+                        // 3. Se disuelve todo justo antes de que unlockTimer suelte el lock.
+                        ParallelAnimation {
+                            NumberAnimation { target: introLockOrb; property: "scale"; from: 1.0; to: 0.7; duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.exit) }
+                            NumberAnimation { target: introOverlay; property: "opacity"; from: 1.0; to: 0.0; duration: Config.anim.instant }
+                        }
+                    }
+
+                    Connections {
+                        target: lockUI
+                        function onUnlockRequested() {
+                            introSequence.stop();   // desbloqueo durante el intro: no pelear por los mismos items
+                            outroSequence.start();
+                        }
                     }
                 }
             }

@@ -139,7 +139,7 @@ Singleton {
 
             property JsonObject themeSync: JsonObject {
                 property string kitty: root._home + "/.config/kitty/colors-quickshell.conf"
-                property string hyprland: root._home + "/.config/hypr/colors-quickshell.conf"
+                property string hyprland: root._home + "/.config/hypr/colors-quickshell.lua"
                 property string starship: root._home + "/.config/starship/starship.toml"
                 property list<string> reloadCmd: ["pkill", "-USR1", "-x", "kitty"]
             }
@@ -149,7 +149,8 @@ Singleton {
                 property list<string> poweroff: ["systemctl", "poweroff"]
                 property list<string> reboot: ["systemctl", "reboot"]
                 property list<string> suspend: ["systemctl", "suspend"]
-                property list<string> logout: ["hyprctl", "dispatch", "exit"]
+                /// Config Lua de Hyprland: `dispatch` toma una expresión Lua.
+                property list<string> logout: ["hyprctl", "dispatch", "hl.dsp.exit()"]
             }
 
             property JsonObject lock: JsonObject {

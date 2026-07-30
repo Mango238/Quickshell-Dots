@@ -6,9 +6,10 @@ import Quickshell.Io
 import qs.Commons
 import qs.Services
 
-// Explorador de notas del vault de Obsidian: lista los .md, filtra con
-// FuzzySort, y abre la nota elegida en Obsidian vía su esquema obsidian://.
-// Sin editor propio. Los vaults se leen en runtime de ~/.config/obsidian/
+// Explorador de notas del vault de Obsidian: lista los .md y filtra con
+// FuzzySort. Click en una nota la abre en el editor del sidebar
+// (NoteEditor.qml); el icono 󰏋 de cada fila la abre en Obsidian vía su
+// esquema obsidian://. Los vaults se leen en runtime de ~/.config/obsidian/
 // obsidian.json (no se hardcodean rutas).
 Item {
     id: root
@@ -226,21 +227,34 @@ Item {
                     elide: Text.ElideMiddle
                 }
             }
+            MouseArea {
+                id: hover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: ObsidianEditor.open(noteItem.modelData)
+            }
+
+            // Después del MouseArea de la fila: los hermanos posteriores quedan
+            // encima, y este click (abrir en Obsidian) tiene que ganarle.
             Text {
                 id: openHint
                 anchors { right: parent.right; rightMargin: 12; verticalCenter: parent.verticalCenter }
                 text: "󰏋"
                 font.pixelSize: 15
                 color: root.textColor
-                opacity: hover.containsMouse ? 0.8 : 0.0
-            }
-            MouseArea {
-                id: hover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: Quickshell.execDetached(
-                    ["xdg-open", "obsidian://open?path=" + encodeURIComponent(noteItem.modelData)])
+                opacity: hover.containsMouse || openHover.containsMouse ? 0.8 : 0.0
+
+                MouseArea {
+                    id: openHover
+                    anchors.centerIn: parent
+                    width: 30
+                    height: 30
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Quickshell.execDetached(
+                        ["xdg-open", "obsidian://open?path=" + encodeURIComponent(noteItem.modelData)])
+                }
             }
         }
     }

@@ -6,7 +6,14 @@ import QtQuick
 Singleton {
     id: colors
 
-    // ── Estado público (semáforo) ──────────────────────────────────
+    // ── Estado público (latch de arranque) ─────────────────────────
+    // Una sola dirección: falso hasta la primera cuantización, verdadero para
+    // siempre. NO bajarlo al cambiar de wallpaper: shell.qml envuelve toda la
+    // UI en un `Loader { active: Colors.ready }`, así que un ready=false
+    // DESTRUYE la shell entera (y con ella popups abiertos, drags del
+    // ecualizador, toasts en vuelo) para reconstruirla ms después. La paleta
+    // nueva llega sola por binding al reasignarse `palette`; mientras tanto se
+    // sigue viendo la anterior, que es lo deseado.
     property bool ready: false
     property string wallpaperPath: ""
     property var palette: []
@@ -85,7 +92,6 @@ Singleton {
                 const resolved = raw.startsWith("/") ? "file://" + raw : raw
                 
                 if (resolved !== colors.wallpaperPath) {
-                    colors.ready = false
                     colors.wallpaperPath = resolved
                     // console.log("Wallpaper via swww:", colors.wallpaperPath)
                 }
@@ -113,8 +119,6 @@ Singleton {
             // Solo actuar si cambió realmente
             if (resolved === colors.wallpaperPath) return
 
-            // ❶ Bajar el semáforo mientras se reprocesa
-            colors.ready = false
             colors.wallpaperPath = resolved
         }
         
@@ -130,7 +134,7 @@ Singleton {
         depth: 3
         rescaleSize: 512
 
-        // ❷ Subir el semáforo cuando los colores estén disponibles
+        // Repuebla la paleta en vivo; `ready` sube la primera vez y ya no baja.
         onColorsChanged: {
             if (!colorQuantizer.colors || colorQuantizer.colors.length === 0)
                 return

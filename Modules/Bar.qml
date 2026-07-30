@@ -75,7 +75,7 @@ Scope {
                     id: spotifyPopup
                     alignItem: rightside
                     show: PopupState.isOpenOn("spotify", root.screen)
-                    panelColor: [SpotifyInfo.albumPalette[4], SpotifyInfo.albumPalette[2]]
+                    panelColor: [SpotifyInfo.albumBg, SpotifyInfo.albumBgDeep]
                     offsetX: -70 // hacia el centro de la barra; ajustar a gusto
                     panelWidth: 500
 
@@ -85,7 +85,7 @@ Scope {
                         sourceComponent: Component {
                             SpotifyAll {
                                 anchors.fill: parent
-                                accent: SpotifyInfo.albumPalette[4]
+                                accent: SpotifyInfo.albumAccent
                             }
                         }
                     }

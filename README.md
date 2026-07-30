@@ -13,6 +13,8 @@ Configuración personal de [Quickshell](https://quickshell.org) para **Hyprland*
 - 🔔 **Notificaciones** con historial persistente, DND y toasts con acciones.
 - 🖼️ **Selector de wallpapers** con filtro por color, orden por tono/luz y atajo global (`WIN+Q`).
 - 🎚️ **Ecualizador paramétrico** sobre PipeWire (filter-chain generado desde `eq/parametric-eq.txt`).
+- 🔌 **Patchbay de PipeWire** en vivo: nodos, cables y niveles reales, con recableado por arrastre
+  (`WIN+P`). Los cables laten con el audio que los cruza.
 - 🎨 **ThemeSync**: la paleta derivada del wallpaper activo se propaga a kitty, Hyprland y starship.
 - 🔒 **Lock screen** propio (`Lock.qml`), reemplaza hyprlock, disparado por `loginctl`.
 
@@ -20,7 +22,8 @@ Configuración personal de [Quickshell](https://quickshell.org) para **Hyprland*
 
 - `quickshell` (paquete oficial en Arch, `pacman -S quickshell`)
 - Hyprland
-- `pipewire` + `wireplumber`
+- `pipewire` + `wireplumber` (`pw-dump`/`pw-link` los usa el patchbay)
+- `jq` (el patchbay filtra los puertos de `pw-dump` con él)
 - `spotifyd` (control vía MPRIS)
 - `cava`
 - Rust/cargo (solo para compilar el widget de CPU, ver [Setup](#setup))
@@ -33,9 +36,10 @@ Configuración personal de [Quickshell](https://quickshell.org) para **Hyprland*
 | `Modules/` | Componentes de alto nivel montados en `shell.qml` (`Bar`, `ClockWidget`, `Equalizer`, `NotificationToast`). |
 | `Widgets/Bar/` | Widgets de la barra: red, bluetooth, batería, pipewire, spotify, cpu, power menu, selector de wallpapers. |
 | `Widgets/Equalizer/` | UI del ecualizador paramétrico (canvas + controles). |
+| `Widgets/Patchbay/` | Grafo del patchbay: tarjetas de nodo, pines y cables (`Shape`/`PathCubic`). |
 | `Widgets/General/` | Componentes reutilizables (popups, panel, botones de media, búsqueda). |
 | `Widgets/Bar/Rust/cpu/` | Binario Rust (`sysinfo`) que alimenta el widget de CPU. |
-| `Services/` | Singletons de estado: `NetworkStats`, `WifiService`, `NotificationService`, `SpotifyInfo`, `ThemeSync`, `PopupState`, `CavaService`, `CpuService`, `WallpaperService`, `EqBootstrap`. |
+| `Services/` | Singletons de estado: `NetworkStats`, `WifiService`, `NotificationService`, `SpotifyInfo`, `ThemeSync`, `PopupState`, `CavaService`, `CpuService`, `WallpaperService`, `EqBootstrap`, `PatchbayService`. |
 | `Commons/` | Utilidades compartidas (`Colors`, `FuzzySort`, íconos de tema, imagen circular). |
 | `eq/parametric-eq.txt` | Definición de bandas del ecualizador, consumida por `scripts/eq_filter_chain.sh`. |
 | `scripts/eq_filter_chain.sh` | Genera el filter-chain de PipeWire a partir de `eq/parametric-eq.txt`. |
@@ -56,6 +60,9 @@ bind = $mainMod, L, exec, loginctl lock-session
 
 # bind para el selector de wallpapers
 bind = $mainMod, Q, global, quickshell:wallpaperToggle
+
+# bind para el patchbay de PipeWire
+bind = $mainMod, P, global, quickshell:patchbayToggle
 ```
 
 El widget de CPU requiere compilar el binario Rust una vez:

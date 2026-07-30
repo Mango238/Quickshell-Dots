@@ -1,0 +1,23 @@
+# graphify: caché regenerable (graphify update .)
+graphify-out/cache/
+
+# caché de runtime de widgets
+Widgets/Bar/.cache
+
+# config de usuario: valores propios de esta máquina.
+# Los defaults viven en Commons/Config.qml, así que sin este archivo
+# el shell arranca igual.
+Config/config.json
+
+# editor / OS
+*~
+*.swp
+.DS_Store
+
+CLAUDE.md
+
+graphify-out
+
+Workspace
+
+Comparativa
