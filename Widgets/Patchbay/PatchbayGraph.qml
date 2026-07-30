@@ -4,18 +4,6 @@ import Quickshell.Services.Pipewire
 import qs.Commons
 import qs.Services
 
-/**
- * El grafo: coloca los nodos en tres columnas por rol, dibuja los cables y maneja el
- * arrastre para crear links.
- *
- * Todo el estado sale de `Quickshell.Services.Pipewire`, que es reactivo (`values` de un
- * ObjectModel notifica). No hay refresco manual: si desconectas el auricular bluetooth,
- * su tarjeta y sus cables se van solos.
- *
- * Las posiciones NO se persisten. Los nodos de aplicación (spotifyd, Brave) cambian de id
- * en cada arranque, así que guardarlas obligaría a purgar huérfanas cada vez; al reabrir
- * el patchbay se recolocan solos.
- */
 Item {
     id: root
 

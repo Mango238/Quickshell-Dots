@@ -22,6 +22,7 @@ Scope {
                 required property var modelData
                 screen: modelData
                 color: "transparent"
+                exclusiveZone: 1
 
                 // Usa modelData (el QScreen estable de Variants), NO win.screen:
                 // win.screen fluctúa al mapear/desmapear la ventana según su
