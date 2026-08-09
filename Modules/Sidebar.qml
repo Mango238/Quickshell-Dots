@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
@@ -102,6 +103,7 @@ Scope {
                             model: [
                                 { key: "obsidian", glyph: "󰠮", bottom: false },
                                 { key: "claude",   glyph: "󰚩", bottom: false },
+                                { key: "instagram", glyph: "󰋾", bottom: false },
                                 { key: "config",   glyph: "󰒓", bottom: true  },
                             ]
                             delegate: Rectangle {
@@ -152,6 +154,7 @@ Scope {
                                   margins: 16 }
                         active: win.open
                         sourceComponent: SidebarState.activeView === "claude" ? claudeComp
+                                       : SidebarState.activeView === "instagram" ? instagramComp
                                        : SidebarState.activeView === "config" ? settingsComp
                                        : ObsidianEditor.path !== "" ? noteEditorComp
                                        : obsidianComp
@@ -160,6 +163,7 @@ Scope {
                     Component { id: obsidianComp; ObsidianView { anchors.fill: parent } }
                     Component { id: noteEditorComp; NoteEditor { anchors.fill: parent } }
                     Component { id: claudeComp;   ClaudeCodeView { anchors.fill: parent } }
+                    Component { id: instagramComp; InstagramView { anchors.fill: parent } }
                     Component { id: settingsComp; SettingsView { anchors.fill: parent } }
                 }
             }

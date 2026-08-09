@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell.Widgets
 import qs.Commons
+import qs.Services
 /**
  * WallpaperThumbnail.qml — Una miniatura dentro de WallpaperGrid.
  *
@@ -21,6 +22,14 @@ Item {
     /// Cursor de navegación por teclado (distinto de selected, que marca el
     /// wallpaper aplicado): borde fino en textColor en vez de accent.
     property bool highlighted: false
+
+    /// Animado (gif o video): lo reproduce mpvpaper, no awww.
+    readonly property bool animated: WallpaperService.isAnimated(root.path)
+    /// Solo el gif se previsualiza animado en hover; el video se muestra por
+    /// su póster (meter un decodificador de video por celda no tiene sentido).
+    readonly property bool isGif: root.animated && !WallpaperService.isVideo(root.path)
+    /// Lo que Qt puede dibujar: la imagen/gif, o el póster extraído del video.
+    readonly property string stillPath: WallpaperService.stillFor(root.path)
 
     property color cardColor: Colors.palette[3]
     property real cardRadius: 10
@@ -44,7 +53,7 @@ Item {
         Image {
             id: img
             anchors.fill: parent
-            source: "file://" + root.path
+            source: "file://" + root.stillPath
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             // Decodificamos directo a un tamaño chico — el ahorro de memoria
@@ -57,6 +66,22 @@ Item {
             Behavior on scale {
                 NumberAnimation { duration: Config.anim.instant; easing.type: Config.easingOf(Config.anim.standard) }
             }
+        }
+
+        // Preview animado, solo para GIFs y solo mientras hay hover: la
+        // source se vacía al salir para que el AnimatedImage libere los
+        // frames. cache:false es obligatorio — cachear CADA frame de un gif
+        // de 20MB por cada celda es exactamente el problema de memoria que
+        // describe el comentario de cabecera.
+        AnimatedImage {
+            anchors.fill: parent
+            visible: root.isGif && root.hovered
+            source: visible ? "file://" + root.path : ""
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: false
+            sourceSize.width: 280
+            sourceSize.height: 180
         }
 
         // Placeholder mientras carga / si falla
@@ -130,6 +155,27 @@ Item {
             }
             Behavior on border.color {
                 ColorAnimation { duration: Config.anim.instant }
+            }
+        }
+
+        // Badge de animado: para distinguir los gif sin tener que hacer hover
+        Rectangle {
+            visible: root.animated
+            width: gifLabel.implicitWidth + 10
+            height: 16
+            radius: 8
+            color: root.accentColor
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.margins: 6
+
+            Text {
+                id: gifLabel
+                anchors.centerIn: parent
+                text: root.isGif ? "GIF" : "VIDEO"
+                color: "#1E1E2E"
+                font.pixelSize: 9
+                font.bold: true
             }
         }
 

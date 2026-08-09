@@ -9,7 +9,8 @@ import Quickshell.Hyprland
 // por monitor vía Variants, igual que Bar.qml).
 QtObject {
     property bool open: false
-    // Vista mostrada dentro del sidebar: "obsidian" | "claude" | "config".
+    // Vista mostrada dentro del sidebar:
+    // "obsidian" | "claude" | "instagram" | "config".
     property string activeView: "obsidian"
     // Conector del monitor donde se abrió (p. ej. "eDP-1"). "" = sin
     // restricción (fallback si no hay IPC de Hyprland).

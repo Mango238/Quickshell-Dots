@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Widgets
 import Quickshell.Services.UPower
@@ -158,6 +159,7 @@ WrapperMouseArea {
 
                     delegate: Component {
                         Text {
+                            required property var modelData
                             visible: !modelData.isLaptopBattery && modelData.model
                             text: modelData.model + ": " + Math.round(modelData.percentage * 100)
                             color: Colors.ensureReadable(Colors.palette[7], Colors.palette[3]); font.pixelSize: 12

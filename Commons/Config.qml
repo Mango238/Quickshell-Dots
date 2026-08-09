@@ -21,8 +21,9 @@ Singleton {
     /// Valores por defecto de lo que NO describe a la máquina ni al usuario.
     /// Es la única copia: las properties del adapter se inicializan desde acá,
     /// y resetDefaults() reasigna desde acá — no hay dos listas que se separen.
-    /// Fuera a propósito: user.*, wallpaper.*, players, obsidian.*, themeSync.*
-    /// y power.* (rutas, comandos y datos personales de esta instalación).
+    /// Fuera a propósito: user.*, wallpaper.*, players, obsidian.*, instagram.*,
+    /// themeSync.* y power.* (rutas, comandos y datos personales de esta
+    /// instalación).
     readonly property var defaults: ({
         font: "JetBrainsMono Nerd Font",
         lock: { hidePassword: false, revealDuration: 300 },
@@ -79,6 +80,7 @@ Singleton {
     property alias wallpaper: adapter.wallpaper
     property alias players: adapter.players
     property alias obsidian: adapter.obsidian
+    property alias instagram: adapter.instagram
     property alias themeSync: adapter.themeSync
     property alias power: adapter.power
     property alias lock: adapter.lock
@@ -126,7 +128,15 @@ Singleton {
             property JsonObject wallpaper: JsonObject {
                 property string dir: root._home + "/Imágenes/archlinux-favorite-wallpapers/"
                 property string backend: "awww"
+                /// Backend para animados (gif/video): awww topa en ~60MB por
+                /// archivo, mpv decodifica el original por hardware.
+                property string videoBackend: "mpvpaper"
+                property string videoOptions: "no-audio loop-file=inf hwdec=auto"
                 property string stateFile: "/tmp/actual_wallpaper.txt"
+                /// Siempre un path que Qt sabe decodificar: la imagen misma, el
+                /// gif, o el póster extraído del video. Lo consume Colors.qml
+                /// para la paleta (stateFile guarda el path real, sin mentir).
+                property string stillFile: "/tmp/actual_wallpaper_still.txt"
                 property string wallAnim: "wave"
 
             }
@@ -135,6 +145,19 @@ Singleton {
 
             property JsonObject obsidian: JsonObject {
                 property string configPath: root._home + "/.config/obsidian/obsidian.json"
+            }
+
+            /// DMs de Instagram en el sidebar. `enabled` es el interruptor:
+            /// con false no se levanta el daemon. `thread` NO se edita a mano,
+            /// lo escribe el selector de la vista para recordar la última
+            /// conversación (aunque acepta un username si preferís fijarlo).
+            /// La sesión la crea a mano `Services/instagram.py --login`.
+            property JsonObject instagram: JsonObject {
+                property bool enabled: false
+                property string thread: ""
+                property int pollSeconds: 20
+                property int amount: 30
+                property string sessionPath: root._home + "/.config/quickshell/Config/instagram-session.json"
             }
 
             property JsonObject themeSync: JsonObject {

@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import Quickshell // for PanelWindow
 import QtQuick // for Text
 import qs.Widgets.Bar

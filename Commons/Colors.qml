@@ -51,7 +51,6 @@ Singleton {
             if (r > bestRatio) {
                 bestRatio = r
                 best = pal[i]
-                console.log(best)
             }
         }
         if (bestRatio >= minRatio)
@@ -101,7 +100,10 @@ Singleton {
 
     FileView {
         id: file
-        path: Config.wallpaper.stateFile
+        // stillFile, no stateFile: con un video de wallpaper el path real no lo
+        // puede decodificar el ColorQuantizer. stillFile siempre apunta a algo
+        // que Qt abre (la imagen, el gif, o el póster que extrae ffmpeg).
+        path: Config.wallpaper.stillFile
         watchChanges: true
         // En el primer arranque tras un reboot el archivo aún no existe; el caso
         // ya está cubierto por onLoadFailed (fallback a `awww query`), así que
@@ -112,7 +114,12 @@ Singleton {
 
         onTextChanged: {
             const raw = file.text().trim()
-            if (raw === "") return
+            // Un archivo que EXISTE pero está vacío no dispara onLoadFailed, así
+            // que sin este fallback la cadena se corta acá: wallpaperPath queda
+            // "", el quantizer nunca emite, `ready` nunca sube y shell.qml:45
+            // no construye una sola ventana. Medido en vivo: shell fantasma,
+            // "Configuration Loaded" en el log y `hyprctl layers` vacío.
+            if (raw === "") { getWallpaper.running = true; return }
 
             const resolved = raw.startsWith("/") ? "file://" + raw : raw
 

@@ -4,10 +4,10 @@ graphify-out/cache/
 # caché de runtime de widgets
 Widgets/Bar/.cache
 
-# config de usuario: valores propios de esta máquina.
-# Los defaults viven en Commons/Config.qml, así que sin este archivo
-# el shell arranca igual.
-Config/config.json
+# estado local de esta máquina: config de usuario (los defaults viven en
+# Commons/Config.qml, así que sin ella el shell arranca igual) y la sesión
+# de Instagram, que son credenciales — el directorio entero fuera de git.
+Config/
 
 # editor / OS
 *~

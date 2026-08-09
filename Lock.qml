@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -199,8 +200,12 @@ ShellRoot {
                 // --------------------------------
 
                 // Fondo: wallpaper actual segun WallpaperService (ruta absoluta sin prefijo -> se antepone file://).
-                property string staticWallpaperPath: WallpaperService.currentWallpaper !== ""
-                    ? "file://" + WallpaperService.currentWallpaper
+                // currentStill, no currentWallpaper: si el wallpaper es un video
+                // esto es el póster. Sigue siendo un frame fijo a propósito —
+                // va detrás de un MultiEffect con blurMax 64, animarlo sería
+                // GPU quemada en algo indistinguible.
+                property string staticWallpaperPath: WallpaperService.currentStill !== ""
+                    ? "file://" + WallpaperService.currentStill
                     : ""
 
                 property string batPct: "100"
@@ -375,6 +380,7 @@ ShellRoot {
                         Repeater {
                             model: 4
                             Rectangle {
+                                required property int index
                                 anchors.centerIn: parent
                                 anchors.verticalCenterOffset: -40 * screenRoot.sc
                                 width: (400 * screenRoot.sc) + (index * (220 * screenRoot.sc))

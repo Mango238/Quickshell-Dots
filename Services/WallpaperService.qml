@@ -31,7 +31,26 @@ QtObject {
     property string stateFilePath: Config.wallpaper.stateFile
 
     /// Extensiones consideradas como wallpaper válido.
-    property var extensions: ["jpg", "jpeg", "png", "webp", "bmp"]
+    property var extensions: ["jpg", "jpeg", "png", "webp", "bmp",
+                              "gif", "mp4", "webm", "mkv", "m4v", "mov"]
+
+    /// Las que van a mpvpaper en vez de awww. Los gif están acá a propósito:
+    /// awww los carga enteros en RAM (+278MB de RSS medidos) y no aplica los
+    /// que pasan de ~60MB; mpv los decodifica igual que cualquier video.
+    readonly property var animatedExtensions: ["gif", "mp4", "webm", "mkv", "m4v", "mov"]
+
+    function isAnimated(path) {
+        if (!path) return false
+        var dot = path.lastIndexOf(".")
+        if (dot === -1) return false
+        return root.animatedExtensions.indexOf(path.slice(dot + 1).toLowerCase()) !== -1
+    }
+
+    /// Solo el video necesita un póster extraído: Qt lee el primer frame de un
+    /// gif nativamente (y el ColorQuantizer también, verificado).
+    function isVideo(path) {
+        return root.isAnimated(path) && !path.toLowerCase().endsWith(".gif")
+    }
 
     /// Opciones de transición de awww. Ver `awww img --help` para más tipos
     /// (grow, wipe, wave, outer, random, none, etc.).
@@ -225,6 +244,38 @@ QtObject {
         }
     }
 
+    /// true mientras ffmpeg extrae pósters de los videos recién escaneados.
+    property bool extractingStills: false
+
+    /// Extrae un frame de cada video que todavía no tenga póster, en UN solo
+    /// proceso (un loop de sh) en vez de uno por archivo. Los que ya están
+    /// cacheados se saltean, así un rescan con caché caliente no cuesta nada.
+    function _generateStills(files) {
+        var vids = files.filter(p => root.isVideo(p))
+        if (vids.length === 0) { root._ensureAnalyzed(); return }
+
+        root.extractingStills = true
+        var script =
+            'd="$1"; shift; mkdir -p "$d"\n' +
+            'for v in "$@"; do\n' +
+            '  o="$d/$(printf "%s" "$v" | tr "/" "_").jpg"\n' +
+            '  [ -s "$o" ] && continue\n' +
+            // -ss 1 saltea el fundido de entrada típico; si el clip dura menos
+            // de un segundo ffmpeg no saca nada y reintentamos desde el inicio.
+            '  ffmpeg -y -v error -ss 1 -i "$v" -frames:v 1 -q:v 3 "$o" </dev/null\n' +
+            '  [ -s "$o" ] || ffmpeg -y -v error -i "$v" -frames:v 1 -q:v 3 "$o" </dev/null\n' +
+            'done'
+        stillProc.command = ["sh", "-c", script, "_", root.stillCacheDir].concat(vids)
+        stillProc.running = true
+    }
+
+    readonly property Process stillProc: Process {
+        onExited: (exitCode, exitStatus) => {
+            root.extractingStills = false
+            root._ensureAnalyzed()
+        }
+    }
+
     /// Encola los wallpapers sin clave de color; si no falta ninguno,
     /// reordena de inmediato.
     function _ensureAnalyzed() {
@@ -252,7 +303,7 @@ QtObject {
         root._pendingQueue = q
         root.analyzeWatchdog.restart()
         root._activeQuantizer = root._quantizerComp.createObject(root, {
-            source: "file://" + root._analyzingPath
+            source: "file://" + root.stillFor(root._analyzingPath)
         })
         root._activeQuantizer.colorsChanged.connect(root._onQuantized)
         root._onQuantized()   // por si la cuantización fue sincrónica (caché de Qt)
@@ -298,6 +349,22 @@ QtObject {
     property string colorCacheDir:
         (Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache"))
         + "/quickshell"
+
+    /// Pósters de video extraídos con ffmpeg. El nombre es el path completo con
+    /// las "/" cambiadas por "_": determinista y calculable igual desde QML y
+    /// desde sh, sin necesitar un hash (QML no tiene md5 a mano).
+    readonly property string stillCacheDir: root.colorCacheDir + "/wallpaper-stills"
+
+    function stillFor(path) {
+        if (!path) return ""
+        if (!root.isVideo(path)) return path   // imagen o gif: Qt los decodifica
+        return root.stillCacheDir + "/" + path.replace(/\//g, "_") + ".jpg"
+    }
+
+    /// Path que Qt puede decodificar para este wallpaper: la imagen misma, el
+    /// gif, o el póster del video. Lo consumen la grilla, Lock.qml y —vía
+    /// stillFile— la paleta de Colors.qml.
+    readonly property string currentStill: root.stillFor(root.currentWallpaper)
 
     readonly property FileView cacheFile: FileView {
         path: root.colorCacheDir + "/wallpaper-colors.json"
@@ -394,14 +461,17 @@ QtObject {
                 // stdout termine de streamear, sobre todo con listas largas.
                 var lines = this.text.split("\n").filter(l => l.trim().length > 0)
 
-                // Aceptamos solo formatos que Qt sabe decodificar
+                // Imágenes que Qt sabe decodificar, más video (que no decodifica
+                // Qt sino mpv: la grilla lo muestra vía póster de ffmpeg).
                 var validMimes = [
                     "image/jpeg",
                     "image/png",
                     "image/webp",
+                    "image/gif",
                     "image/bmp",
                     "image/tiff",
-                    "image/x-ms-bmp"
+                    "image/x-ms-bmp",
+                    "video/"
                 ]
 
                 var found = []
@@ -424,10 +494,11 @@ QtObject {
                 }
                 root.wallpapers = found
                 root.scanning = false
-                // Siempre: los swatches del filtro por color necesitan las
-                // claves aunque el orden sea "nombre". Con caché caliente es
-                // inmediato; en frío corre asíncrono sin bloquear.
-                root._ensureAnalyzed()
+                // Los pósters primero: el análisis de color y las miniaturas
+                // los necesitan en disco. _generateStills encadena a
+                // _ensureAnalyzed cuando termina (o de inmediato si no hay
+                // video que procesar).
+                root._generateStills(found)
             }
         }
         onExited: (exitCode, exitStatus) => {
@@ -442,8 +513,61 @@ QtObject {
 
     // ─── Detección del wallpaper actual (vía `awww query`) ──────────────────
 
+    /// mpvpaper primero: su superficie está encima de la de awww, así que si
+    /// corre, él es el wallpaper visible. `pgrep -a` devuelve el cmdline
+    /// completo, que termina en el path — no hace falta un archivo de estado
+    /// propio, coherente con cómo el servicio ya trata a awww.
     function refreshCurrent() {
-        queryProc.running = true
+        videoQueryProc.running = true
+    }
+
+    readonly property Process videoQueryProc: Process {
+        command: ["pgrep", "-a", "-x", Config.wallpaper.videoBackend]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // Puede haber MÁS DE UNA línea: si por lo que sea quedaron dos
+                // mpvpaper vivos, el visible es el último en crear su superficie
+                // (verificado en `hyprctl layers`: dentro de la capa background
+                // el último listado se dibuja arriba). Por eso se parsea la
+                // última línea y no el texto entero — hacerlo sobre el texto
+                // completo devolvía el path de la primera pegado al resto.
+                var lines = this.text.split("\n").filter(l => l.trim().length > 0)
+                if (lines.length === 0) {
+                    // Sin mpvpaper vivo. Antes de concluir que manda awww:
+                    // ¿el wallpaper persistido era animado? Si sí, esto es un
+                    // arranque de sesión (mpvpaper no sobrevive al reboot) y
+                    // hay que relanzarlo. Una sola vez por proceso, si no
+                    // cada recarga volvería a dispararlo.
+                    if (!root._restoredOnce) {
+                        root._restoredOnce = true
+                        // reload() explícito: el archivo lo escribe este mismo
+                        // servicio por fuera de FileView, así que el contenido
+                        // cacheado puede estar desactualizado.
+                        stateView.reload()
+                        var persisted = stateView.text().trim()
+                        if (persisted !== "" && root.isAnimated(persisted)) {
+                            root.apply(persisted)
+                            return
+                        }
+                    }
+                    queryProc.running = true
+                    return
+                }
+
+                // "1234 mpvpaper -f -s -a FULL -o ... ALL /ruta/al/video.mp4"
+                var line = lines[lines.length - 1]
+                var idx = line.indexOf(" ALL ")
+                var path = idx === -1 ? "" : line.slice(idx + 5).trim()
+                if (path === "") { queryProc.running = true; return }
+                root.currentWallpapersByOutput = ({})
+                root.currentWallpaper = path
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            // pgrep sale 1 cuando no hay match y stdout puede no emitirse:
+            // sin video corriendo, la verdad la tiene awww.
+            if (exitCode !== 0) queryProc.running = true
+        }
     }
 
     readonly property Process queryProc: Process {
@@ -483,8 +607,75 @@ QtObject {
         if (!path || root.applying) return
         root.applying = true
         pendingPath = path
+
+        if (root.isAnimated(path)) {
+            root._applyVideo(path)
+            return
+        }
+
+        // Estático: mpvpaper tiene que morir primero o su superficie sigue
+        // tapando la de awww (ambas viven en la capa `background`).
+        Quickshell.execDetached(["pkill", "-x", Config.wallpaper.videoBackend])
         applyProc.command = buildApplyCommand(path)
         applyProc.running = true
+    }
+
+    /// Lanza mpvpaper sobre TODAS las salidas. Sin IPC a propósito: el estado
+    /// se lee después con `pgrep -a`, así no hace falta socat.
+    ///   -f       desprende el proceso
+    ///   -p       pausa mpv cuando el wallpaper queda tapado (CPU casi cero)
+    ///   -a FULL  extiende eso a ventanas en pantalla completa (batería, juegos).
+    ///            No MAX: también dispararía con ventanas maximizadas, que en un
+    ///            tiling es casi siempre, y el video viviría parando y arrancando.
+    ///            `-a` NO es un flag suelto — sin el argumento mpvpaper aborta
+    ///            con "Neither FULL or MAX was selected for the auto-mode".
+    ///
+    /// NO usar -s (auto-stop) en vez de -p: medido en Hyprland, -s no "detiene
+    /// la reproducción" sino que TERMINA el proceso apenas una ventana tapa el
+    /// wallpaper (muerto a los 8s; con -p sobrevive). Y sin proceso vivo,
+    /// refreshCurrent() deja de ver el video y cree que manda awww.
+    /// Matar y lanzar van en UN solo shell desprendido, no en dos llamadas con
+    /// un Timer en el medio: así el orden está garantizado (pkill es asíncrono,
+    /// y lanzar en el mismo tick dejaba dos mpvpaper peleando por la capa).
+    /// `setsid` es imprescindible: sin él mpvpaper queda en el grupo de procesos
+    /// de quickshell y muere con la primera recarga de config. `exec` al final
+    /// hace que el proceso resultante se llame "mpvpaper", que es lo que busca
+    /// el `pgrep -x` de refreshCurrent().
+    function _applyVideo(path) {
+        // Process y no Quickshell.execDetached: execDetached falla en SILENCIO
+        // (sin código de salida ni stderr), y depurar el lanzamiento a ciegas
+        // costó varias iteraciones. `setsid --fork` garantiza que este Process
+        // termine de inmediato mientras mpvpaper queda en su propia sesión —
+        // imprescindible, si no muere con la primera recarga de config.
+        videoProc.command = ["setsid", "--fork", "sh", "-c",
+            'pkill -x "$1"; sleep 0.3; exec "$1" -f -p -a FULL -o "$2" ALL "$3"',
+            "_", Config.wallpaper.videoBackend, Config.wallpaper.videoOptions, path]
+        videoProc.running = true
+        videoSettleTimer.restart()
+    }
+
+    readonly property Process videoProc: Process {
+        stderr: StdioCollector {
+            onStreamFinished: {
+                if (this.text.trim().length > 0)
+                    console.warn("WallpaperService: mpvpaper:", this.text.trim())
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0)
+                console.warn("WallpaperService: fallo al lanzar mpvpaper, código", exitCode)
+        }
+    }
+
+    /// mpvpaper tarda un momento en aparecer en la tabla de procesos; sin esta
+    /// espera, refreshCurrent() haría el pgrep antes de tiempo, no lo vería y
+    /// concluiría que manda awww.
+    readonly property Timer videoSettleTimer: Timer {
+        interval: 1200
+        onTriggered: {
+            root.applying = false
+            root.refreshCurrent()
+        }
     }
 
     property string pendingPath: ""
@@ -548,9 +739,34 @@ QtObject {
         // va a volver a intentarlo con el valor más reciente.
         if (writeStateProc.running) return
 
+        // stillFor() se llama directo, NO se lee root.currentStill: esa
+        // property es un binding y este handler corre en onCurrentWallpaperChanged,
+        // antes de que se reevalúe — leerla acá publicaba el valor viejo (al
+        // arrancar, ""), y un stillFile vacío deja a Colors.ready en false, que
+        // por shell.qml:45 significa la shell entera sin construir.
+        var still = root.stillFor(root.currentWallpaper)
+        if (!still) return
+
+        // stateFile = path real; stillFile = algo decodificable por Qt. El
+        // still solo se publica si de verdad quedó en disco: si ffmpeg falla,
+        // es preferible dejar el stillFile anterior (wallpaper viejo, paleta
+        // vieja) que apuntar a un archivo ausente y brickear la shell.
+        // Escritura ATÓMICA (tmp + mv), no `> archivo`. Una recarga de config
+        // mata a los procesos hijos, y `>` trunca ANTES de que printf escriba:
+        // si el proceso muere en esa ventana, el archivo queda en 0 bytes.
+        // Medido: así se generó el stillFile vacío que dejó a Colors.ready en
+        // false y al shell entero sin construir una sola ventana.
         writeStateProc.command = [
-            "sh", "-c", 'printf "%s" "$1" > "$2"',
-            "_", root.currentWallpaper, root.stateFilePath
+            "sh", "-c",
+            'printf "%s" "$1" > "$2.tmp" && mv -f "$2.tmp" "$2"\n' +
+            'if [ "$3" != "$1" ] && [ ! -s "$3" ]; then\n' +
+            '  mkdir -p "$(dirname "$3")"\n' +
+            '  ffmpeg -y -v error -ss 1 -i "$1" -frames:v 1 -q:v 3 "$3" </dev/null\n' +
+            '  [ -s "$3" ] || ffmpeg -y -v error -i "$1" -frames:v 1 -q:v 3 "$3" </dev/null\n' +
+            'fi\n' +
+            '[ -s "$3" ] && printf "%s" "$3" > "$4.tmp" && mv -f "$4.tmp" "$4"',
+            "_", root.currentWallpaper, root.stateFilePath,
+            still, Config.wallpaper.stillFile
         ]
         writeStateProc.running = true
     }
@@ -572,9 +788,41 @@ QtObject {
         }
     }
 
+    // ─── Restauración del wallpaper animado al arrancar ─────────────────────
+
+    /// mpvpaper no sobrevive a un reboot y awww no sabe de él, así que tras
+    /// iniciar sesión el video no vuelve solo. La decisión de relanzarlo vive
+    /// en videoQueryProc (rama "no hay mpvpaper"), que es el único lugar que ya
+    /// sabe si hace falta.
+    ///
+    /// Se lee con FileView y no con `cat` en un Process a propósito: el
+    /// StdioCollector resultó poco fiable acá — a veces onStreamFinished no
+    /// dispara (el propio scanProc de este archivo ya lo documenta), y con eso
+    /// la restauración salía intermitente. FileView es además el patrón que
+    /// Colors.qml ya usa sobre este mismo archivo.
+    readonly property FileView stateView: FileView {
+        path: Config.wallpaper.stateFile
+        printErrors: false      // primer arranque: puede no existir todavía
+        // Lectura SÍNCRONA: se consulta desde el handler de videoQueryProc y
+        // hay que decidir ahí mismo si restaurar. Sin esto text() devolvía
+        // vacío o contenido viejo porque la carga todavía no había terminado,
+        // y la restauración no ocurría nunca.
+        blockLoading: true
+    }
+
+    /// Una sola restauración por proceso: sin esto, cada recarga de config
+    /// (que dispara al tocar cualquier .qml) relanzaría mpvpaper.
+    property bool _restoredOnce: false
+
     Component.onCompleted: {
-        Quickshell.execDetached(["mkdir", "-p", root.colorCacheDir])
+        Quickshell.execDetached(["mkdir", "-p", root.stillCacheDir])
         scan()
+        // refreshCurrent() resuelve las dos cosas de una: detecta un mpvpaper
+        // ya vivo, y si no hay ninguno decide si toca restaurar el animado
+        // persistido antes de caer al fallback de `awww query`. El orden
+        // importa: consultar awww primero devolvía la última imagen ESTÁTICA y
+        // reescribía el stateFile, pisando el wallpaper animado justo antes de
+        // poder restaurarlo.
         refreshCurrent()
     }
 }

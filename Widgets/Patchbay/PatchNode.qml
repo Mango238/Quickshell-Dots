@@ -6,8 +6,10 @@ import qs.Services
 /**
  * Tarjeta de un nodo de PipeWire dentro del patchbay.
  *
- * Se coloca sola (x/y vienen de PatchbayGraph al crearse) y el arrastre pisa esos
- * bindings a propósito: a partir del primer arrastre la tarjeta manda sobre el layout.
+ * No se coloca sola: la posición vive en `graph.pos` y la tarjeta solo la lee al nacer
+ * (x/y) y se la devuelve al soltar el arrastre. Tiene que ser así porque PipeWire destruye
+ * y recrea este delegate cada vez que aparece o desaparece un nodo, y una posición guardada
+ * en la tarjeta se perdía en cada una de esas.
  *
  * El medidor de nivel usa PwNodePeakMonitor, que abre una captura de stream real. Por eso
  * `enabled` está acotado a "ventana abierta y nodo con al menos un link": encenderlo en
@@ -63,6 +65,32 @@ Rectangle {
         cursorShape: drag.active ? Qt.ClosedHandCursor : Qt.OpenHandCursor
         drag.target: card
         drag.axis: Drag.XAndYAxis
+        // Sin esto el Flickable del grafo roba el grab pasado el umbral de arrastre: la
+        // tarjeta se quedaría clavada y lo que se movería es el lienzo entero.
+        preventStealing: true
+        // El scroll está acotado en 0 (StopAtBounds), así que una tarjeta con coordenadas
+        // negativas quedaba fuera de alcance para siempre. Único clamp que hace falta:
+        // colX/rowY ya devuelven positivos, así que savePos nunca ve un negativo.
+        drag.minimumX: 0
+        drag.minimumY: 0
+        // Al soltar (o al cancelarse el grab) hay que devolverle la posición al grafo: es
+        // lo único que sobrevive a que PipeWire recree este delegate.
+        drag.onActiveChanged: if (!dragArea.drag.active && card.node)
+            card.graph.savePos(card.node.id, card.x, card.y)
+    }
+
+    // Marquesina del título: solo con el ratón sobre la tarjeta. HoverHandler y no
+    // `hoverEnabled` en dragArea porque es pasivo — ni el MouseArea del mute ni el
+    // preventStealing del arrastre lo tocan.
+    HoverHandler { id: cardHover }
+
+    // Mide el texto CRUDO. Con elide activo, el contentWidth del Text es el del texto ya
+    // recortado, así que usarlo ataría la condición al mismo elide que la condición
+    // controla. TextMetrics es inmune a eso y deja fijo el recorrido de la animación.
+    TextMetrics {
+        id: titleMetrics
+        font: title.font
+        text: card.label
     }
 
     WheelHandler {
@@ -80,14 +108,73 @@ Rectangle {
         anchors.margins: 9
         spacing: 3
 
-        Text {
-            id: title
+        // Con el ratón encima se apaga el elide y el texto va y vuelve dentro del recorte;
+        // sin hover queda exactamente como antes, elidido con "…" y quieto. Mismo
+        // `parent.width - 18` de siempre para que ese estado sea idéntico píxel a píxel.
+        Item {
+            id: titleClip
+
             width: parent.width - 18
-            elide: Text.ElideRight
-            text: card.label
-            font.family: Config.font
-            font.pixelSize: 12
-            color: card.fg
+            height: title.implicitHeight
+            clip: true
+
+            Text {
+                id: title
+
+                property real scrollOffset: 0
+
+                width: parent.width
+                wrapMode: Text.NoWrap
+                elide: cardHover.hovered ? Text.ElideNone : Text.ElideRight
+                x: -title.scrollOffset
+                text: card.label
+                font.family: Config.font
+                font.pixelSize: 12
+                color: card.fg
+
+                // Ida y vuelta con pausa en cada punta, como la otra marquesina del repo
+                // (Widgets/Bar/Spotify.qml), pero NO con sus tiempos: sus 60 ms/px están
+                // calibrados para el desborde chico de la barra. Acá los nodos se llaman
+                // "Core Ultra 200V Series Processors HD Audio HDMI / DisplayPort 1 Output"
+                // — medido, 503 px contra 184 de ancho útil, o sea 324 px de recorrido, que
+                // a 60 ms/px son 19 s por pasada. A 20 ms/px (50 px/s, velocidad de lectura
+                // cómoda) son 6,5 s. La pausa inicial también baja: el hover es una acción
+                // deliberada, esperar 2 s a que arranque lo que pediste se siente roto.
+                SequentialAnimation {
+                    id: marquee
+
+                    readonly property real travel:
+                        titleMetrics.advanceWidth - titleClip.width + 5
+                    readonly property int dur: Math.max(1400, marquee.travel * 20)
+
+                    running: cardHover.hovered && marquee.travel > 0
+                    loops: Animation.Infinite
+                    // Al salir el ratón vuelve a 0: si no, el próximo hover se pasa la pausa
+                    // inicial mostrando el offset viejo antes de que la animación lo pise.
+                    onRunningChanged: if (!marquee.running) title.scrollOffset = 0
+
+                    PauseAnimation { duration: 100 }
+
+                    NumberAnimation {
+                        target: title
+                        property: "scrollOffset"
+                        from: 0
+                        to: marquee.travel
+                        duration: marquee.dur
+                        easing.type: Easing.Linear
+                    }
+
+                    PauseAnimation { duration: 1200 }
+
+                    NumberAnimation {
+                        target: title
+                        property: "scrollOffset"
+                        to: 0
+                        duration: marquee.dur
+                        easing.type: Easing.Linear
+                    }
+                }
+            }
         }
 
         Text {

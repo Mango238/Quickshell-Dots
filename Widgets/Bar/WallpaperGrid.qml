@@ -398,7 +398,12 @@ Item {
 
             delegate: WallpaperThumbnail {
                 required property int index
-                path: WallpaperService.visibleWallpapers[index]
+                // El ?? "" no es decorativo: `model` es la LONGITUD del array, y
+                // durante un rescan la longitud y el contenido se actualizan en
+                // ticks distintos, así que el índice puede quedar fuera de rango
+                // por un frame. Sin esto, `path` (required string) recibe
+                // undefined y el log se llena de "Unable to assign [undefined]".
+                path: WallpaperService.visibleWallpapers[index] ?? ""
                 width: root.cellWidth
                 height: root.cellHeight
 

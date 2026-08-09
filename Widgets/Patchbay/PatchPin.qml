@@ -4,7 +4,9 @@ import qs.Commons
 /**
  * Conector de una tarjeta. El de salida (isOutput) es el que se arrastra para crear un
  * link; el de entrada solo marca dónde aterrizan los cables. El arrastre se reporta en
- * coordenadas del grafo, que es donde se dibuja el cable elástico.
+ * coordenadas del LIENZO (graph.canvas), no del viewport: es donde se dibuja el cable
+ * elástico y donde endLink hit-testea las tarjetas. Mapear al grafo daría coordenadas
+ * corridas por el scroll en cuanto hayas paneado.
  */
 Rectangle {
     id: pin
@@ -13,7 +15,11 @@ Rectangle {
     required property Item card
     required property bool isOutput
 
-    readonly property bool armed: pin.isOutput && pin.graph.linkingFrom === pin.card.node.id
+    // `node?.id`: cuando PipeWire destruye un nodo, el puntero de card.node se pone en null
+    // y este binding se reevalúa antes de que muera la tarjeta. Sin el guard eso era un
+    // "TypeError: Cannot read property 'id' of null" cada vez que desaparecía un nodo.
+    // undefined nunca iguala a linkingFrom (-1 en reposo), así que no arma nada de más.
+    readonly property bool armed: pin.isOutput && pin.graph.linkingFrom === pin.card.node?.id
 
     width: 11
     height: 11
@@ -36,18 +42,19 @@ Rectangle {
         preventStealing: true
 
         function report(mouse) {
-            const p = mapToItem(pin.graph, mouse.x, mouse.y)
+            const p = mapToItem(pin.graph.canvas, mouse.x, mouse.y)
             pin.graph.dragX = p.x
             pin.graph.dragY = p.y
         }
 
         onPressed: mouse => {
+            if (!pin.card.node) return
             report(mouse)
             pin.graph.linkingFrom = pin.card.node.id
         }
         onPositionChanged: mouse => report(mouse)
         onReleased: mouse => {
-            const p = mapToItem(pin.graph, mouse.x, mouse.y)
+            const p = mapToItem(pin.graph.canvas, mouse.x, mouse.y)
             pin.graph.endLink(p.x, p.y)
         }
         onCanceled: pin.graph.linkingFrom = -1

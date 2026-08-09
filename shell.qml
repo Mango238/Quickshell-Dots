@@ -1,11 +1,34 @@
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import QtQuick
 import qs.Modules
 import qs.Commons
 import qs.Services
 
 ShellRoot {
+
+    // Mismo control que los GlobalShortcut de abajo, pero invocable desde
+    // cualquier script o compositor:
+    //   qs ipc call popup toggle wallpaper
+    //   qs ipc call sidebar open obsidian
+    // Los GlobalShortcut usan el protocolo hyprland-global-shortcuts, que solo
+    // existe bajo Hyprland y no se puede disparar desde fuera. `qs ipc show`
+    // lista los targets.
+    IpcHandler {
+        target: "popup"
+        function toggle(name: string): void { PopupState.toggle(name) }
+    }
+
+    IpcHandler {
+        target: "sidebar"
+        function toggle(): void { SidebarState.toggle() }
+        // `open`, no `show`: el CLI de quickshell ya tiene un subcomando
+        // `ipc show`, y CLI11 se come el nombre de la función antes de tratarlo
+        // como positional — `ipc call sidebar show obsidian` falla con
+        // "argument was not expected" salvo que metas un `--` de por medio.
+        function open(view: string): void { SidebarState.show(view) }
+    }
 
     // WIN+Q — togglea el selector de wallpapers. El lado Hyprland es
     // `bind = $mainMod, Q, global, quickshell:wallpaperToggle` en hyprland.conf.
@@ -37,6 +60,13 @@ ShellRoot {
     // Activa el singleton ThemeSync (perezoso): propaga Colors.palette a
     // kitty/Hyprland/starship en cada cambio de wallpaper.
     property var _themeSync: ThemeSync
+
+    // Ídem WallpaperService. Sin esto solo nacía al abrir el popup de
+    // wallpapers, y entonces al iniciar sesión NO corría su Component.onCompleted:
+    // mpvpaper no sobrevive al reboot, así que un wallpaper animado no volvía
+    // hasta que abrieras el selector. Va acá afuera a propósito, no dentro del
+    // Loader gateado por Colors.ready — la restauración no depende de la paleta.
+    property var _wallpaperService: WallpaperService
 
     // ── UI bloqueada hasta que la paleta esté lista ─────────────
 

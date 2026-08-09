@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Hyprland
 import Quickshell.Wayland
@@ -143,6 +144,7 @@ Row {
                 model: Hyprland.workspaces
                 delegate: Rectangle {
                     id: cell
+                    required property var modelData
                     // Oculta el Special Workspace (ID -98) de este contenedor
                     visible: modelData.id !== -98
 
@@ -272,6 +274,7 @@ Row {
 
                 delegate: Rectangle {
                     id: specialDelegate
+                    required property var modelData
                     // Muestra ÚNICAMENTE el Special Workspace en este contenedor
                     visible: modelData.id === -98
 
