@@ -10,7 +10,6 @@ Item {
     property var eqBands: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     property string selectedPreset: "Flat"
     property string applyStatus: "Not applied"
-    property string currentSinkName: ""
     property string lastAppliedTargetSink: ""
     property string pendingAutoTargetSink: ""
     property bool pendingEqApply: false
@@ -21,14 +20,16 @@ Item {
     property bool bandDragActive: false
     readonly property bool isBusy: eqProc.running
     readonly property var defaultSink: Pipewire.defaultAudioSink
-    onDefaultSinkChanged: scheduleRefresh(80)
+    // El EQ vive colgado del sink por defecto (filter-graph en su propiedad
+    // audioconvert.filter-graph.0), así que la salida "real" ya no hay que deducirla con
+    // pactl y el state file como cuando existía el sink virtual: es exactamente este nodo.
+    // Mientras PipeWire cambia de salida, defaultAudioSink queda un instante en null; el ""
+    // resultante lo absorbe la guarda de onCurrentSinkNameChanged.
+    readonly property string currentSinkName: backend.defaultSink ? (backend.defaultSink.name || "") : ""
     readonly property var presetNames: ["Flat", "Bass", "Movie", "Treble", "Voice", "Vocal", "Pop", "Rock", "Jazz", "Classic"]
     readonly property string homeDir: Quickshell.env("HOME") || ""
     readonly property string configDir: Quickshell.env("XDG_CONFIG_HOME") || (homeDir + "/.config")
-    readonly property string stateHome: Quickshell.env("XDG_STATE_HOME") || (homeDir + "/.local/state")
     readonly property string eqScriptPath: configDir + "/quickshell/scripts/eq_filter_chain.sh"
-    readonly property string eqPipewireConfPath: configDir + "/pipewire/pipewire.conf.d/90-quickshell-eq.conf"
-    readonly property string eqStatePath: stateHome + "/quickshell/eq_filter_chain.state"
 
     readonly property var presetMap: ({
         "Flat":    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -53,29 +54,6 @@ Item {
         if (nextCommand !== undefined) proc.command = nextCommand;
         proc.running = true;
         return true;
-    }
-
-    function scheduleRefresh(delayMs) {
-        refreshDebounce.interval = delayMs !== undefined ? delayMs : 120;
-        refreshDebounce.restart();
-    }
-
-    function shellQuote(text) {
-        return "'" + String(text).replace(/'/g, "'\\''") + "'";
-    }
-
-    function parseAudioSnapshot(text) {
-        var lines = text.trim().split("\n");
-        for (var i = 0; i < lines.length; i++) {
-            var l = lines[i].trim();
-            if (l.indexOf("SINK=") === 0) {
-                var s = l.substring(5);
-                if (s.length > 0) {
-                    backend.currentSinkName = s;
-                    if (backend.lastAppliedTargetSink.length === 0) backend.lastAppliedTargetSink = s;
-                }
-            }
-        }
     }
 
     function parseEqState(text) {
@@ -135,8 +113,6 @@ Item {
                 backend.applyStatus = errText.length > 0 ? ("Error (" + code + "): " + errText) : ("Error (" + code + ")");
                 console.warn("EqualizerBackend", backend.applyStatus);
             }
-            backend.scheduleRefresh(120);
-            delayedRefreshTimer.restart();
             if (eqProc.requestedAction !== "disable") routeRecoveryTimer.restart();
             eqProc.out = "";
             eqProc.requestedAction = "";
@@ -160,21 +136,18 @@ Item {
 
     PwObjectTracker { objects: [ backend.defaultSink ] }
 
-    Process {
-        id: audioInfoProc
-        command: ["/bin/bash", "-c", "STATE_FILE=" + backend.shellQuote(backend.eqStatePath)
-            + "; DEFAULT_SINK=$(/usr/bin/pactl info | /usr/bin/awk -F': ' '/^Default Sink:/{print $2; exit}')"
-            + "; RUNNING_SINK=$(/usr/bin/pactl list short sinks | /usr/bin/awk '$5 == \"RUNNING\" {print $2}' | /usr/bin/grep -v '^effect_input\\.eq$' | /usr/bin/head -n1)"
-            + "; STATE_SINK=''; if [ -f \"$STATE_FILE\" ]; then STATE_SINK=$(/usr/bin/awk -F'=' '/^BASE_SINK=/{print $2; exit}' \"$STATE_FILE\"); fi"
-            + "; S=\"$DEFAULT_SINK\"; if [ \"$DEFAULT_SINK\" = \"effect_input.eq\" ]; then if [ -n \"$STATE_SINK\" ]; then S=\"$STATE_SINK\"; elif [ -n \"$RUNNING_SINK\" ]; then S=\"$RUNNING_SINK\"; fi; fi"
-            + "; echo \"SINK=$S\""]
-        running: false
-        property string out: ""
-        stdout: SplitParser { onRead: data => { audioInfoProc.out += data + "\n"; } }
-        onExited: {
-            backend.parseAudioSnapshot(audioInfoProc.out);
-            audioInfoProc.out = "";
-        }
+    // Un sink SUSPENDIDO ignora el set del filter-graph en silencio: solo lo acepta mientras
+    // está `running`, o sea con audio pasando de verdad. PwNode no expone ese estado, pero
+    // que le aparezca un link es el mismo momento, así que sirve de disparador para
+    // re-aplicar. Cubre el caso de mover un slider sin nada sonando: al arrancar la música,
+    // el EQ se engancha solo.
+    // `linkGroups` acá es una lista de QML (QQmlListReference), no un ObjectModel como
+    // Pipewire.linkGroups: no tiene `values` ni `valuesChanged`, así que se escucha su propio
+    // notify y se mide con `length`.
+    PwNodeLinkTracker {
+        id: sinkLinks
+        node: backend.defaultSink
+        onLinkGroupsChanged: if (sinkLinks.linkGroups.length > 0) routeRecoveryTimer.restart()
     }
 
     Process {
@@ -190,7 +163,7 @@ Item {
     }
 
     onCurrentSinkNameChanged: {
-        if (currentSinkName.length === 0 || currentSinkName === "effect_input.eq") return;
+        if (currentSinkName.length === 0) return;
         if (lastAppliedTargetSink.length === 0) {
             lastAppliedTargetSink = currentSinkName;
             return;
@@ -211,28 +184,15 @@ Item {
         }
     }
 
-    Timer {
-        id: delayedRefreshTimer
-        interval: 1200
-        repeat: false
-        onTriggered: backend.scheduleRefresh(50)
-    }
-
+    // Red de seguridad: re-aplica el grafo poco después de cada operación y cuando el sink
+    // gana links. Volver a poner un grafo que ya está puesto es idempotente — la propiedad es
+    // de solo escritura y no hay forma de consultar si está, así que se re-aplica en vez de
+    // detectar.
     Timer {
         id: routeRecoveryTimer
         interval: 1800
         repeat: false
-        onTriggered: {
-            if (!recoverProc.running) recoverProc.running = true;
-            backend.scheduleRefresh(100);
-        }
-    }
-
-    Timer {
-        id: refreshDebounce
-        interval: 120
-        repeat: false
-        onTriggered: backend.refreshAudioInfo()
+        onTriggered: if (!recoverProc.running) recoverProc.running = true
     }
 
     function sameBands(a, b) {
@@ -315,13 +275,12 @@ Item {
     }
 
     function applyToPipeWire(bands) {
-        var targetSink = "auto";
-        if (currentSinkName.length > 0 && currentSinkName !== "effect_input.eq") targetSink = currentSinkName;
+        var targetSink = currentSinkName.length > 0 ? currentSinkName : "auto";
         applyEqToTarget(targetSink, bands);
     }
 
     function autoApplyForCurrentSink() {
-        if (currentSinkName.length === 0 || currentSinkName === "effect_input.eq") return;
+        if (currentSinkName.length === 0) return;
         if (eqProc.running) return;
         applyStatus = "Syncing output...";
         eqProc.requestedTargetSink = currentSinkName;
@@ -339,10 +298,6 @@ Item {
         startManagedProcess(eqProc, ["/bin/bash", eqScriptPath, "disable"]);
     }
 
-    function refreshAudioInfo() {
-        startManagedProcess(audioInfoProc);
-    }
-
     function applyPendingBands() {
         if (eqProc.running || !hasPendingEqChanges) return;
         queueEqApply();
@@ -352,8 +307,5 @@ Item {
         startManagedProcess(readEqProc);
     }
 
-    Component.onCompleted: {
-        loadEqStateFromFile();
-        scheduleRefresh(0);
-    }
+    Component.onCompleted: loadEqStateFromFile()
 }

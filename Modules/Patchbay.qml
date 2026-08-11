@@ -43,7 +43,7 @@ PanelWindow {
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.margins: 18
-            text: "arrastra desde el punto derecho de un nodo para conectar · ✕ sobre un cable para cortar · rueda para volumen · arrastra el fondo para mover el lienzo"
+            text: "arrastra desde el punto derecho de un nodo para conectar · ✕ sobre un cable para cortar · rueda para volumen · ★ para hacer la salida predeterminada · arrastra el fondo para mover el lienzo"
             font.family: Config.font
             font.pixelSize: 10
             color: Qt.alpha(Colors.palette[7], 0.45)

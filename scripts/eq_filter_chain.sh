@@ -1,17 +1,43 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ecualizador paramétrico de 10 bandas sobre el sink de salida.
+#
+# El EQ NO es un módulo ni un nodo propio: es un filter-graph colgado del nodo del sink de
+# hardware con la propiedad `audioconvert.filter-graph.0`. Desde PipeWire 1.4 audioconvert
+# admite hasta 8 filter-graphs intercambiables EN CALIENTE dentro de cualquier nodo, así que
+# cambiar las ganancias no toca el grafo de audio: no nacen ni mueren nodos, nadie se
+# re-rutea, y las aplicaciones ni se enteran.
+#
+# Antes esto se montaba con libpipewire-module-parametric-equalizer declarado en un drop-in de
+# pipewire.conf.d, lo que obligaba a `systemctl --user restart pipewire pipewire-pulse` en cada
+# cambio de ganancia — context.modules solo se lee al arrancar el daemon. Ese reinicio mataba
+# el grafo entero; en particular tumbaba la conexión de Spotify con pipewire-pulse, que al ser
+# cliente Pulse no se reconecta solo y había que reiniciarlo a mano para recuperar sus nodos.
+#
+# Detalles del mecanismo que se pagaron con pruebas y no son evidentes:
+#   - La propiedad es de solo escritura: leerla siempre devuelve "". No se puede consultar si
+#     el grafo está puesto, así que aquí NUNCA se detecta — se re-aplica y punto (es idempotente).
+#   - Un sink SUSPENDIDO ignora el set en silencio. Solo lo acepta mientras está `running`,
+#     o sea con audio de verdad pasando. Por eso existe `recover`: el QML lo dispara cuando el
+#     sink por defecto cambia o cuando le aparecen links.
+#   - El valor es spa-json dentro de una cadena, así que las comillas interiores hay que
+#     escaparlas. Con un solo nodo no hacen falta links (y los puertos de param_eq no se llaman
+#     In/Out, así que intentar enlazarlo rompe el grafo entero en silencio).
+
 HOME_DIR="${HOME}"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME_DIR/.config}"
 QS_DIR="${QUICKSHELL_CONFIG_DIR:-$CONFIG_DIR/quickshell}"
 EQ_DIR="$QS_DIR/eq"
 EQ_FILE="$EQ_DIR/parametric-eq.txt"
-PW_CONF_DIR="${PIPEWIRE_CONF_DIR:-$CONFIG_DIR/pipewire/pipewire.conf.d}"
-PW_CONF_FILE="$PW_CONF_DIR/90-quickshell-eq.conf"
 STATE_DIR="${XDG_STATE_HOME:-$HOME_DIR/.local/state}/quickshell"
 STATE_FILE="$STATE_DIR/eq_filter_chain.state"
 
-mkdir -p "$EQ_DIR" "$PW_CONF_DIR" "$STATE_DIR"
+# Ranura de filter-graph. Hay 8 (0..7); la 0 es la nuestra. Usar una fija es lo que permite
+# reemplazar el EQ sin apilar copias.
+EQ_SLOT="audioconvert.filter-graph.0"
+
+mkdir -p "$EQ_DIR" "$STATE_DIR"
 
 FREQS=(31 63 125 250 500 1000 2000 4000 8000 16000)
 
@@ -23,7 +49,7 @@ need_cmd() {
 }
 
 check_deps() {
-  local deps=(pactl wpctl pw-cli pw-link awk grep head sed tr systemctl)
+  local deps=(pactl pw-cli awk grep head sed)
   for c in "${deps[@]}"; do
     need_cmd "$c"
   done
@@ -36,21 +62,17 @@ read_state() {
   fi
 }
 
+# Solo hace falta recordar en qué sink quedó colgado el grafo, para poder limpiarlo al cambiar
+# de salida. El volumen ya no se guarda: es el del sink de hardware, que gestiona PipeWire.
 write_state() {
   cat > "$STATE_FILE" <<STATE
 BASE_SINK=${BASE_SINK:-}
-BASE_SOURCE=${BASE_SOURCE:-}
-EQ_SINK_VOLUME=${EQ_SINK_VOLUME:-40%}
-EQ_SINK_MUTED=${EQ_SINK_MUTED:-0}
+EQ_ENABLED=${EQ_ENABLED:-1}
 STATE
 }
 
 default_sink() {
   pactl info | awk -F': ' '/^Default Sink:/ {print $2; exit}'
-}
-
-default_source() {
-  pactl info | awk -F': ' '/^Default Source:/ {print $2; exit}'
 }
 
 node_id_by_name() {
@@ -67,119 +89,23 @@ node_id_by_name() {
   '
 }
 
-set_default_sink_compat() {
-  local sink_name="$1"
-  local sink_id=""
-  for _ in {1..10}; do
-    sink_id="$(node_id_by_name Node "$sink_name" || true)"
-    if [[ -n "$sink_id" ]]; then
-      wpctl set-default "$sink_id" >/dev/null 2>&1 && break || true
-    fi
-    sleep 0.2
-  done
-  pactl set-default-sink "$sink_name" >/dev/null 2>&1 || true
-}
-
-set_default_source_compat() {
-  local source_name="$1"
-  local source_id=""
-  for _ in {1..10}; do
-    source_id="$(node_id_by_name Node "$source_name" || true)"
-    if [[ -n "$source_id" ]]; then
-      wpctl set-default "$source_id" >/dev/null 2>&1 && break || true
-    fi
-    sleep 0.2
-  done
-  pactl set-default-source "$source_name" >/dev/null 2>&1 || true
-}
-
-move_sink_inputs_to() {
-  local sink_name="$1"
-  local input_id=""
-
-  while read -r input_id _; do
-    [[ -n "$input_id" ]] || continue
-    pactl move-sink-input "$input_id" "$sink_name" >/dev/null 2>&1 || true
-  done < <(pactl list short sink-inputs 2>/dev/null || true)
-}
-
-capture_eq_sink_state() {
-  if sink_exists "effect_input.eq"; then
-    EQ_SINK_VOLUME="$(pactl get-sink-volume "effect_input.eq" 2>/dev/null | sed -n 's/.* \([0-9]\+%\).*/\1/p' | head -n1 || true)"
-    EQ_SINK_MUTED="$(pactl get-sink-mute "effect_input.eq" 2>/dev/null | awk '{print ($2 == "yes" ? "1" : "0")}' || true)"
-  fi
-
-  [[ -n "${EQ_SINK_VOLUME:-}" ]] || EQ_SINK_VOLUME="40%"
-  [[ -n "${EQ_SINK_MUTED:-}" ]] || EQ_SINK_MUTED="0"
-}
-
-normalize_eq_sink() {
-  if sink_exists "effect_input.eq"; then
-    pactl set-sink-volume "effect_input.eq" "${EQ_SINK_VOLUME:-40%}" >/dev/null 2>&1 || true
-    pactl set-sink-mute "effect_input.eq" "${EQ_SINK_MUTED:-0}" >/dev/null 2>&1 || true
-  fi
-}
-
-relink_eq_output_to_base_sink() {
-  local sink_name="$1"
-  local candidate=""
-
-  [[ -n "$sink_name" ]] || return 0
-
-  while read -r _ candidate _; do
-    [[ -n "$candidate" ]] || continue
-    [[ "$candidate" == "effect_input.eq" ]] && continue
-    pw-link -d effect_output.eq:output_1 "$candidate:playback_FL" >/dev/null 2>&1 || true
-    pw-link -d effect_output.eq:output_2 "$candidate:playback_FR" >/dev/null 2>&1 || true
-  done < <(pactl list short sinks 2>/dev/null || true)
-
-  for _ in {1..20}; do
-    if pw-link "effect_output.eq:output_1" "$sink_name:playback_FL" >/dev/null 2>&1 &&
-       pw-link "effect_output.eq:output_2" "$sink_name:playback_FR" >/dev/null 2>&1; then
-      return 0
-    fi
-    sleep 0.2
-  done
-
-  echo "Failed to relink EQ output to $sink_name" >&2
-  return 1
+sink_exists() {
+  pactl list short sinks | awk '{print $2}' | grep -Fxq "$1"
 }
 
 first_real_sink() {
-  pactl list short sinks | awk '{print $2}' | grep -Ev '^effect_input\.eq$' | head -n1
+  pactl list short sinks | awk '{print $2}' | head -n1
 }
 
 running_real_sink() {
-  pactl list short sinks | awk '$5 == "RUNNING" {print $2}' | grep -Ev '^effect_input\.eq$' | head -n1
-}
-
-sink_exists() {
-  local sink="$1"
-  pactl list short sinks | awk '{print $2}' | grep -Fxq "$sink"
-}
-
-is_virtual_eq_sink() {
-  [[ "${1:-}" == "effect_input.eq" ]]
-}
-
-source_exists() {
-  local source="$1"
-  pactl list short sources | awk '{print $2}' | grep -Fxq "$source"
-}
-
-first_real_source() {
-  pactl list short sources | awk '{print $2}' | grep -Ev '^effect_(input|output)\.eq(\.monitor)?$' | head -n1
-}
-
-running_real_source() {
-  pactl list short sources | awk '$5 == "RUNNING" {print $2}' | grep -Ev '^effect_(input|output)\.eq(\.monitor)?$' | head -n1
+  pactl list short sinks | awk '$5 == "RUNNING" {print $2}' | head -n1
 }
 
 pick_best_sink() {
   local cur_sink="${1:-}"
   local remembered_sink="${2:-}"
   local running_sink=""
-  if [[ -n "$cur_sink" && "$cur_sink" != "effect_input.eq" ]] && sink_exists "$cur_sink"; then
+  if [[ -n "$cur_sink" ]] && sink_exists "$cur_sink"; then
     echo "$cur_sink"
     return
   fi
@@ -193,26 +119,6 @@ pick_best_sink() {
     return
   fi
   first_real_sink || true
-}
-
-pick_best_source() {
-  local cur_source="${1:-}"
-  local remembered_source="${2:-}"
-  local running_source=""
-  if [[ -n "$cur_source" && ! "$cur_source" =~ ^effect_(input|output)\.eq(\.monitor)?$ ]] && source_exists "$cur_source"; then
-    echo "$cur_source"
-    return
-  fi
-  if [[ -n "$remembered_source" ]] && source_exists "$remembered_source"; then
-    echo "$remembered_source"
-    return
-  fi
-  running_source="$(running_real_source || true)"
-  if [[ -n "$running_source" ]] && source_exists "$running_source"; then
-    echo "$running_source"
-    return
-  fi
-  first_real_source || true
 }
 
 ensure_gains() {
@@ -232,6 +138,8 @@ ensure_gains() {
   printf '%s\n' "${out[@]}"
 }
 
+# Formato AutoEQ/ParametricEQ. Sigue siendo la fuente de la verdad de las ganancias: lo lee
+# `param_eq` al cargar el grafo, y el QML lo relee para hidratar los sliders al arrancar.
 write_eq_file() {
   local gains=("$@")
   {
@@ -243,122 +151,31 @@ write_eq_file() {
   } > "$EQ_FILE"
 }
 
-write_pipewire_conf() {
-  cat > "$PW_CONF_FILE" <<CONF
-context.modules = [
-  {
-    name = libpipewire-module-parametric-equalizer
-    args = {
-      equalizer.filepath = "$EQ_FILE"
-      equalizer.description = "Quickshell EQ"
-
-      capture.props = {
-        node.name = "effect_input.eq"
-        node.description = "Quickshell EQ Sink"
-        media.class = "Audio/Sink"
-      }
-
-      playback.props = {
-        node.name = "effect_output.eq"
-        node.description = "Quickshell EQ Output"
-        node.passive = true
-        node.autoconnect = false
-      }
-    }
-  }
-]
-CONF
+eq_graph() {
+  printf '{ nodes = [ { type = builtin name = eq label = param_eq config = { filename = %s } } ] }' "$EQ_FILE"
 }
 
-restart_audio_stack() {
-  systemctl --user restart pipewire.service pipewire-pulse.service
-  for _ in {1..30}; do
-    if pactl info >/dev/null 2>&1; then
-      sleep 0.2
-      return
-    fi
-    sleep 0.2
-  done
-}
-
-wait_for_eq_nodes() {
-  for _ in {1..30}; do
-    if sink_exists "effect_input.eq" && node_id_by_name Node "effect_output.eq" >/dev/null 2>&1; then
-      return 0
-    fi
-    sleep 0.2
-  done
-  echo "EQ nodes did not come up in time" >&2
-  return 1
-}
-
-wait_for_sink() {
-  local sink_name="$1"
-  [[ -n "$sink_name" ]] || return 0
-  for _ in {1..100}; do
-    if sink_exists "$sink_name"; then
-      return 0
-    fi
-    sleep 0.2
-  done
-  echo "Timed out waiting for sink: $sink_name" >&2
-  return 1
-}
-
-wait_for_source() {
-  local source_name="$1"
-  [[ -n "$source_name" ]] || return 0
-  for _ in {1..100}; do
-    if source_exists "$source_name"; then
-      return 0
-    fi
-    sleep 0.2
-  done
-  echo "Timed out waiting for source: $source_name" >&2
-  return 1
-}
-
-stabilize_eq_route() {
-  local sink_name="$1"
-
-  [[ -n "$sink_name" ]] || return 0
-
-  for _ in {1..5}; do
-    relink_eq_output_to_base_sink "$sink_name" || true
-    move_sink_inputs_to "effect_input.eq" || true
-    sleep 0.3
-  done
-}
-
-finalize_eq_route() {
-  local sink_name="$1"
-
-  [[ -n "$sink_name" ]] || return 0
-
-  for _ in {1..8}; do
-    relink_eq_output_to_base_sink "$sink_name" || true
-    set_default_sink_compat "effect_input.eq" || true
-    move_sink_inputs_to "effect_input.eq" || true
-    sleep 0.25
-  done
-}
-
-recover_eq() {
-  read_state
-  capture_eq_sink_state
-  write_state
-
-  local sink="${BASE_SINK:-}"
-  if [[ -z "$sink" || "$sink" == "effect_input.eq" ]]; then
-    sink="$(pick_best_sink "$(default_sink || true)" "${BASE_SINK:-}")"
+# $1 = node.name del sink, $2 = grafo ("" para quitarlo).
+set_graph() {
+  local sink="${1:-}" graph="${2:-}" id=""
+  [[ -n "$sink" ]] || return 0
+  id="$(node_id_by_name Node "$sink" || true)"
+  if [[ -z "$id" ]]; then
+    echo "Sink not found in the PipeWire graph: $sink" >&2
+    return 1
   fi
+  pw-cli s "$id" Props "{ params = [ \"$EQ_SLOT\" \"$graph\" ] }" >/dev/null
+}
 
-  wait_for_eq_nodes || true
-  [[ -n "$sink" ]] && stabilize_eq_route "$sink" || true
-  normalize_eq_sink
-  set_default_sink_compat "effect_input.eq" || true
-  [[ -n "${BASE_SOURCE:-}" ]] && set_default_source_compat "$BASE_SOURCE" || true
-  echo "recovered"
+# param_eq lee el archivo AL CARGAR el grafo, así que para que unas ganancias nuevas surtan
+# efecto hay que reemplazar el grafo, no solo reescribir el archivo. Se limpia antes de poner:
+# no está documentado si audioconvert deduplica cuando el string entrante es idéntico, y dos
+# llamadas de pw-cli cuestan milisegundos.
+install_graph() {
+  local sink="${1:-}"
+  [[ -n "$sink" ]] || return 0
+  set_graph "$sink" ""
+  set_graph "$sink" "$(eq_graph)"
 }
 
 apply_eq() {
@@ -367,57 +184,41 @@ apply_eq() {
   local gains=("$@")
 
   read_state
-  capture_eq_sink_state
-  local cur_sink cur_source
+  local cur_sink previous_sink
   cur_sink="$(default_sink || true)"
-  cur_source="$(default_source || true)"
+  previous_sink="${BASE_SINK:-}"
 
   if [[ "$target_sink" != "auto" ]]; then
-    if is_virtual_eq_sink "$target_sink"; then
-      target_sink="auto"
-    fi
-    if sink_exists "$target_sink"; then
-      BASE_SINK="$target_sink"
-    else
+    if ! sink_exists "$target_sink"; then
       echo "Requested sink not found: $target_sink" >&2
       exit 1
     fi
+    BASE_SINK="$target_sink"
   else
     BASE_SINK="$(pick_best_sink "$cur_sink" "${BASE_SINK:-}")"
   fi
 
-  BASE_SOURCE="$(pick_best_source "$cur_source" "${BASE_SOURCE:-}")"
-
   write_eq_file "${gains[@]}"
-  write_pipewire_conf
+  EQ_ENABLED=1
   write_state
 
-  restart_audio_stack
-  wait_for_eq_nodes || true
-  [[ -n "${BASE_SINK:-}" ]] && wait_for_sink "$BASE_SINK" || true
-  [[ -n "${BASE_SOURCE:-}" ]] && wait_for_source "$BASE_SOURCE" || true
+  # Si el EQ estaba colgado de otro sink, dejarlo limpio: si no, el grafo viejo se queda ahí
+  # y esa salida sigue ecualizada a espaldas del usuario.
+  if [[ -n "$previous_sink" && "$previous_sink" != "${BASE_SINK}" ]]; then
+    set_graph "$previous_sink" "" || true
+  fi
 
-  [[ -n "${BASE_SINK:-}" ]] && stabilize_eq_route "$BASE_SINK" || true
-  normalize_eq_sink
-  set_default_sink_compat "effect_input.eq" || true
-  [[ -n "${BASE_SOURCE:-}" ]] && set_default_source_compat "$BASE_SOURCE" || true
-  [[ -n "${BASE_SINK:-}" ]] && finalize_eq_route "$BASE_SINK" || true
-  normalize_eq_sink
-  echo "applied file=$EQ_FILE"
+  install_graph "$BASE_SINK"
+  echo "applied file=$EQ_FILE sink=$BASE_SINK"
 }
 
 switch_eq_target() {
   local target_sink="${1:-}"
 
   read_state
-  capture_eq_sink_state
 
   if [[ -z "$target_sink" ]]; then
     echo "Usage: $0 switch <target_sink>" >&2
-    exit 2
-  fi
-  if is_virtual_eq_sink "$target_sink"; then
-    echo "Refusing to switch to virtual EQ sink" >&2
     exit 2
   fi
   if ! sink_exists "$target_sink"; then
@@ -425,63 +226,62 @@ switch_eq_target() {
     exit 1
   fi
 
+  if [[ -n "${BASE_SINK:-}" && "$BASE_SINK" != "$target_sink" ]]; then
+    set_graph "$BASE_SINK" "" || true
+  fi
+
   BASE_SINK="$target_sink"
   write_state
 
-  if [[ -f "$PW_CONF_FILE" ]] && sink_exists "effect_input.eq"; then
-    wait_for_eq_nodes || true
-    wait_for_sink "$BASE_SINK" || true
-    stabilize_eq_route "$BASE_SINK" || true
-    normalize_eq_sink
-    set_default_sink_compat "effect_input.eq" || true
-    [[ -n "${BASE_SOURCE:-}" ]] && set_default_source_compat "$BASE_SOURCE" || true
-    finalize_eq_route "$BASE_SINK" || true
-    normalize_eq_sink
-    echo "switched target=$BASE_SINK"
-    return 0
+  if [[ "${EQ_ENABLED:-1}" == "1" ]]; then
+    install_graph "$BASE_SINK"
   fi
-
-  set_default_sink_compat "$BASE_SINK" || true
-  echo "switched base=$BASE_SINK"
+  echo "switched target=$BASE_SINK"
 }
 
 disable_eq() {
   read_state
-  capture_eq_sink_state
-  write_state
-
-  rm -f "$PW_CONF_FILE"
-  restart_audio_stack
-
   local sink="${BASE_SINK:-}"
-  if [[ -z "$sink" || "$sink" == "effect_input.eq" ]]; then
-    sink="$(first_real_sink || true)"
-  fi
-  [[ -n "$sink" ]] && set_default_sink_compat "$sink" || true
+  [[ -n "$sink" ]] || sink="$(default_sink || true)"
 
-  local cur_source src
-  cur_source="$(default_source || true)"
-  src="${BASE_SOURCE:-}"
-  if [[ -z "$src" || "$src" =~ ^effect_(input|output)\.eq(\.monitor)?$ ]]; then
-    src="$(first_real_source || true)"
-  fi
-  if [[ "$cur_source" =~ ^effect_(input|output)\.eq(\.monitor)?$ && -n "$src" ]]; then
-    set_default_source_compat "$src" || true
-  fi
-
+  [[ -n "$sink" ]] && { set_graph "$sink" "" || true; }
+  EQ_ENABLED=0
+  write_state
   echo "disabled"
+}
+
+# Re-aplica el grafo al sink por defecto actual. Lo llama el QML cuando cambia el sink o
+# cuando le aparecen links, que es el momento en que pasa de `suspended` a `running` y por
+# fin acepta el filter-graph.
+recover_eq() {
+  read_state
+  if [[ "${EQ_ENABLED:-1}" != "1" ]]; then
+    echo "recovered (disabled)"
+    return 0
+  fi
+
+  local sink
+  sink="$(pick_best_sink "$(default_sink || true)" "${BASE_SINK:-}")"
+  [[ -n "$sink" ]] || { echo "recovered (no sink)"; return 0; }
+
+  if [[ -n "${BASE_SINK:-}" && "$BASE_SINK" != "$sink" ]]; then
+    set_graph "$BASE_SINK" "" || true
+  fi
+
+  BASE_SINK="$sink"
+  write_state
+  install_graph "$sink"
+  echo "recovered sink=$sink"
 }
 
 status_eq() {
   read_state
   echo "qs_dir=$QS_DIR"
-  echo "conf=$PW_CONF_FILE"
   echo "eq_file=$EQ_FILE"
+  echo "eq_slot=$EQ_SLOT"
   echo "base_sink=${BASE_SINK:-}"
-  echo "base_source=${BASE_SOURCE:-}"
+  echo "eq_enabled=${EQ_ENABLED:-1}"
   echo "default_sink=$(default_sink || true)"
-  echo "default_source=$(default_source || true)"
-  echo "conf_exists=$([[ -f "$PW_CONF_FILE" ]] && echo yes || echo no)"
 }
 
 cmd="${1:-status}"

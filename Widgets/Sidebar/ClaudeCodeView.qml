@@ -72,15 +72,14 @@ Item {
                      : msg.isError ? Qt.alpha(Colors.danger, 0.9)
                      : root.cardColor
 
-                Text {
+                // ponytail: las fórmulas se renderizan del color de MathRender
+                // (el del texto asistente), también en una burbuja de usuario.
+                MarkdownView {
                     id: bubbleText
                     anchors { left: parent.left; right: parent.right; margins: 12; verticalCenter: parent.verticalCenter }
-                    text: msg.text
-                    textFormat: Text.MarkdownText
-                    wrapMode: Text.Wrap
+                    source: msg.text
                     color: msg.isUser ? Colors.accentText : root.textColor
                     font.pixelSize: 13
-                    onLinkActivated: (url) => Qt.openUrlExternally(url)
                 }
             }
         }

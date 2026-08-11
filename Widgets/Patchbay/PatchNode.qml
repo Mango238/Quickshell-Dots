@@ -38,6 +38,13 @@ Rectangle {
     readonly property var ports: PatchbayService.portsByNode[node.id] || null
     readonly property bool hasOut: ports !== null && ports.out.length > 0
     readonly property bool hasIn: ports !== null && ports.in.length > 0
+    // Candidato a sink por defecto: nodos de dispositivo que aceptan audio — tarjetas,
+    // auriculares y también el filter-chain del ecualizador (Source y Sink a la vez).
+    // Los streams no, aunque lleven el bit Sink: ahí ese bit significa "reproduce"
+    // (ver roleOf en PatchbayGraph), no "es una salida".
+    readonly property bool canBeDefault: (node.type & PwNodeType.Sink) !== 0
+                                         && (node.type & PwNodeType.Stream) === 0
+    readonly property bool isDefault: Pipewire.defaultAudioSink === card.node
     readonly property color fg: Colors.ensureReadable(Colors.palette[7], Colors.palette[4])
 
     width: 220
@@ -114,7 +121,10 @@ Rectangle {
         Item {
             id: titleClip
 
-            width: parent.width - 18
+            // Se descuenta la fila de iconos medida, no un 18 fijo: con la estrella puesta
+            // son dos iconos y el título se metía debajo. `actions` no depende de esta
+            // anchura (su tamaño sale de las métricas de sus textos), así que no hay loop.
+            width: parent.width - actions.width - 5
             height: title.implicitHeight
             clip: true
 
@@ -187,21 +197,50 @@ Rectangle {
         }
     }
 
-    // Mute: solo aparece en nodos con control de volumen.
-    Text {
+    // Esquina de acciones: predeterminado y mute.
+    Row {
+        id: actions
+
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 8
-        visible: card.vol !== null
-        text: card.vol && card.vol.muted ? "󰝟" : "󰕾"
-        font.pixelSize: 12
-        color: card.vol && card.vol.muted ? Colors.danger : Qt.alpha(card.fg, 0.7)
+        spacing: 12
 
-        MouseArea {
-            anchors.fill: parent
-            anchors.margins: -6
-            cursorShape: Qt.PointingHandCursor
-            onClicked: card.vol.muted = !card.vol.muted
+        // Estrella: marca este nodo como sink por defecto de PipeWire. Es lo mismo que
+        // `wpctl set-default`, así que wireplumber manda ahí los streams nuevos y arrastra
+        // los que ya suenan y no tengan un destino fijado a mano.
+        // No hay estado "sin predeterminado" que desmarcar: PipeWire siempre tiene uno.
+        Text {
+            visible: card.canBeDefault
+            text: card.isDefault ? "󰓎" : "󰓒"
+            font.pixelSize: 12
+            color: card.isDefault ? Colors.accent : Qt.alpha(card.fg, 0.45)
+
+            Accessible.role: Accessible.Button
+            Accessible.name: card.isDefault ? "Salida predeterminada"
+                                            : "Hacer salida predeterminada"
+
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -5
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Pipewire.preferredDefaultAudioSink = card.node
+            }
+        }
+
+        // Mute: solo aparece en nodos con control de volumen.
+        Text {
+            visible: card.vol !== null
+            text: card.vol && card.vol.muted ? "󰝟" : "󰕾"
+            font.pixelSize: 12
+            color: card.vol && card.vol.muted ? Colors.danger : Qt.alpha(card.fg, 0.7)
+
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -6
+                cursorShape: Qt.PointingHandCursor
+                onClicked: card.vol.muted = !card.vol.muted
+            }
         }
     }
 
