@@ -85,6 +85,7 @@ Singleton {
     property alias power: adapter.power
     property alias lock: adapter.lock
     property alias anim: adapter.anim
+    property alias sideBar: adapter.sideBar
 
     /// El directorio Config/ no lo trackea git (solo contiene el config.json
     /// ignorado), así que en un clon nuevo no existe. FileView no lo crea.
@@ -191,6 +192,10 @@ Singleton {
                 property string emphasized: "OutBack"
                 property string decelerate: "OutExpo"
                 property string exit: "InCubic"
+            }
+
+            property JsonObject sideBar: JsonObject {
+                property bool closeWhenClicked: false
             }
         }
     }

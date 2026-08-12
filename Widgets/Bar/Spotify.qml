@@ -7,7 +7,13 @@ Item {
     clip: true
 
     property var trackData: SpotifyInfo.trackData
-    width: mediaText.contentWidth / 1.7
+
+    // Ancho máximo del pill. Antes era contentWidth/1.7, que por construcción
+    // deja el contenedor SIEMPRE más angosto que el texto: needsScrolling era
+    // true siempre y el marquee corría 24/7 (~60 fps de repintado de toda la
+    // barra, en cada monitor). Con un tope fijo, los títulos cortos no scrollean.
+    readonly property int maxWidth: 200
+    width: Math.min(mediaText.implicitWidth, maxWidth)
     height: 20   
     MouseArea {
         anchors.fill: parent
@@ -38,15 +44,18 @@ Item {
         opacity: 1
 
         onTextChanged: {
+            // Sin restart() del scroll: restart() escribe running=true a mano y
+            // rompe el binding de abajo para siempre, así que el marquee ya no
+            // podía apagarse nunca. El binding solo ya lo arranca si hace falta.
             scrollOffset = 0;
             textShift = 0;
-            scrollAnimation.restart();
             textChangeAnimation.restart();
         }
 
         SequentialAnimation {
             id: scrollAnimation
             running: mediaText.needsScrolling && textContainer.visible
+                     && (SpotifyInfo.activePlayer?.isPlaying ?? false)
             loops: Animation.Infinite
 
             PauseAnimation {

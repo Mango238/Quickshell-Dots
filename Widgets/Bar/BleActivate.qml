@@ -10,8 +10,6 @@ Rectangle {
 
     property string label: "󰂯"
     property bool danger: false
-    property color accentColor: Colors.accent
-    property color dangerColor: Colors.danger
 
     signal clicked()
 
@@ -19,9 +17,11 @@ Rectangle {
     implicitHeight: 20
     radius: 13
     color: {
-        var base = danger ? dangerColor : accentColor
+        const base = PopupState.isOpen("bluetooth") ? Colors.accent
+                                                    : Qt.alpha(Colors.accent, 0.45)
         return mouseArea.pressed ? Qt.darker(base, 1.25) : base
     }
+
     scale: mouseArea.pressed ? 0.96 : 1.0
 
     Behavior on color { ColorAnimation { duration: 80 } }

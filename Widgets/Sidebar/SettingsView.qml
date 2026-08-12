@@ -301,6 +301,14 @@ Item {
                 value: Config.anim.exit
                 onPicked: v => Config.anim.exit = v
             }
+
+            SectionLabel { text: "Opciones" }
+
+            ToggleRow {
+                label: "Cerrar al hacer clic fuera"
+                value: Config.sideBar.closeWhenClicked
+                onToggled: v => Config.sideBar.closeWhenClicked = v
+            }
         }
     }
 

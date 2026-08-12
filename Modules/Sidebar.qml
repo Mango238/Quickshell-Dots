@@ -69,7 +69,7 @@ Scope {
                 HyprlandFocusGrab {
                     id: grab
                     windows: [ win ]
-                    onCleared: if (win.open) SidebarState.close()
+                    onCleared: if (win.open && Config.sideBar.closeWhenClicked) SidebarState.close()
                 }
 
                 Rectangle {
