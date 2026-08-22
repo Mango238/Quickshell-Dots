@@ -412,6 +412,50 @@ Item {
                     }
                 }
             }
+
+            // Preset propio: "Custom" recupera lo guardado en Config/config.json,
+            // "Guardar" mete las bandas actuales ahí. Va en su propia fila para no
+            // romper la grilla de 5+5 de los presets fijos.
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+
+                PresetButton { name: "Custom" }
+
+                Rectangle {
+                    Layout.preferredHeight: 32
+                    Layout.preferredWidth: saveTxt.implicitWidth + 26
+                    radius: 8
+                    color: saveMa.containsMouse ? root.cSurface1 : root.cPresetIdle
+                    border.width: 1
+                    border.color: root.cSurface2
+                    opacity: root.backend.isBusy ? 0.5 : 1.0
+
+                    Behavior on color { ColorAnimation { duration: Config.anim.base } }
+
+                    Text {
+                        id: saveTxt
+                        anchors.centerIn: parent
+                        text: "󰆓  Guardar"
+                        color: saveMa.containsMouse ? root.cText : root.cSubText
+                        font.family: Config.font
+                        font.pixelSize: 11
+                        font.bold: true
+                        Behavior on color { ColorAnimation { duration: Config.anim.base } }
+                    }
+
+                    MouseArea {
+                        id: saveMa
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (root.backend.isBusy) return;
+                            root.backend.saveCustomPreset();
+                        }
+                    }
+                }
+            }
         }
 
         // ============ ESTADO + BYPASS ============

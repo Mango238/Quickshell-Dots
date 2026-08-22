@@ -36,6 +36,49 @@ Item {
     readonly property bool isPaired: device && device.paired
     readonly property bool isPairing: device && device.pairing
 
+    // Un dispositivo NO confiado hace que bluetoothd rechace la autorización de sus
+    // perfiles al conectar ("Authentication attempt without agent" +
+    // "a2dp.c:auth_cb() Access denied" en journalctl -u bluetooth): sin un agente BlueZ
+    // registrado en el sistema no hay quién autorice, y BlueZ solo salta ese paso cuando
+    // el device está Trusted. Por eso todo camino que termina en connect() lo marca antes
+    // — es el equivalente al `bluetoothctl trust` que se hace a mano.
+    property bool requesting: false
+
+    function connectTrusted(pairFirst) {
+        if (!row.device) return
+        row.device.trusted = true
+        if (pairFirst) {
+            row.device.pair()   // el resto lo encadena onPairedChanged
+            return
+        }
+        row.requesting = true
+        requestTimeout.restart()
+        row.device.connect()
+    }
+
+    Connections {
+        target: row.device
+
+        // pair() deja el device emparejado pero desconectado: sin esto el usuario tiene
+        // que hacer un segundo clic en "Conectar" para que suene.
+        function onPairedChanged() {
+            if (row.device.paired) row.connectTrusted(false)
+        }
+
+        function onConnectedChanged() {
+            row.requesting = false
+            requestTimeout.stop()
+        }
+    }
+
+    // Si la conexión falla no llega ningún connectedChanged y el botón quedaba en
+    // "Conectando..." para siempre.
+    Timer {
+        id: requestTimeout
+        interval: 8000
+        onTriggered: row.requesting = false
+    }
+
     Rectangle {
         id: bg
         anchors.fill: parent
@@ -109,8 +152,8 @@ Item {
 
             BluetoothActionButton {
                 visible: !row.isPairing && !row.isPaired
-                label: row.isPairing ? "Emparejando..." : "Emparejar" 
-                onClicked: row.device.pair()
+                label: "Emparejar"
+                onClicked: row.connectTrusted(true)
                 accentColor: row.accentColor
                 dangerColor: row.dangerColor
             }
@@ -118,19 +161,11 @@ Item {
             BluetoothActionButton {
                 id: connectBtn
                 visible: !row.isPairing && row.isPaired && !row.isConnected
-                property bool requesting: false
 
-                label: requesting ? "Conectando..." : "Conectar"
-                onClicked: {
-                    this.requesting = true
-                    row.device.connect()
-                }
+                label: row.requesting ? "Conectando..." : "Conectar"
+                onClicked: row.connectTrusted(false)
                 accentColor: row.accentColor
                 dangerColor: row.dangerColor
-                Connections {
-                    target: row.device
-                    function onConnectedChanged() { connectBtn.requesting = false }
-                }
             }
 
             BluetoothActionButton {

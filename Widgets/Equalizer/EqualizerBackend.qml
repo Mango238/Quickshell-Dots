@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import qs.Commons
 
 Item {
     id: backend
@@ -31,7 +32,17 @@ Item {
     readonly property string configDir: Quickshell.env("XDG_CONFIG_HOME") || (homeDir + "/.config")
     readonly property string eqScriptPath: configDir + "/quickshell/scripts/eq_filter_chain.sh"
 
+    /// El slot "Custom" sale de Config (Config/config.json) y no de acá, así que el
+    /// mapa se re-evalúa solo cuando el usuario guarda uno nuevo. JsonAdapter entrega
+    /// `list<real>` como lista QML, no como Array JS: Array.from() la convierte para que
+    /// applyPreset() pueda hacerle .slice().
+    readonly property var customBands: {
+        var c = Config.equalizer.custom
+        return (c && c.length === 10) ? Array.from(c) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+
     readonly property var presetMap: ({
+        "Custom":  backend.customBands,
         "Flat":    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Bass":    [5, 4, 3, 2, 1, 0, -2, -3, -4, -5],
         "Movie":   [4, 3, 2, 0, -1, 0, 2, 3, 4, 4],
@@ -225,6 +236,13 @@ Item {
         if (!hydratingEqState && hasPendingEqChanges) {
             applyStatus = "Unapplied changes";
         }
+    }
+
+    /// Guarda las bandas actuales en el slot "Custom". Solo persiste: aplicar al audio
+    /// sigue siendo el botón Apply, igual que con cualquier cambio de banda.
+    function saveCustomPreset() {
+        Config.equalizer.custom = backend.eqBands.slice();
+        backend.selectedPreset = "Custom";
     }
 
     function applyPreset(name) {

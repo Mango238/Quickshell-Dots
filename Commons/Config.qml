@@ -86,6 +86,7 @@ Singleton {
     property alias lock: adapter.lock
     property alias anim: adapter.anim
     property alias sideBar: adapter.sideBar
+    property alias equalizer: adapter.equalizer
 
     /// El directorio Config/ no lo trackea git (solo contiene el config.json
     /// ignorado), así que en un clon nuevo no existe. FileView no lo crea.
@@ -132,7 +133,15 @@ Singleton {
                 /// Backend para animados (gif/video): awww topa en ~60MB por
                 /// archivo, mpv decodifica el original por hardware.
                 property string videoBackend: "mpvpaper"
-                property string videoOptions: "no-audio loop-file=inf hwdec=auto"
+                /// panscan=1.0 es lo que hace que el video LLENE la pantalla:
+                /// mpv por defecto (panscan=0) conserva el aspecto con barras
+                /// negras, y acá casi todo el material es 16:9 sobre un panel
+                /// 16:10 (1920x1080 en 1920x1200 = 60px arriba y 60 abajo,
+                /// medido con osd-dimensions). 1.0 recorta el sobrante en vez
+                /// de deformar — el mismo criterio que el `--resize crop` que
+                /// awww ya aplica del lado estático, así que ambos backends se
+                /// ven igual.
+                property string videoOptions: "no-audio loop-file=inf hwdec=auto panscan=1.0"
                 property string stateFile: "/tmp/actual_wallpaper.txt"
                 /// Siempre un path que Qt sabe decodificar: la imagen misma, el
                 /// gif, o el póster extraído del video. Lo consume Colors.qml
@@ -196,6 +205,13 @@ Singleton {
 
             property JsonObject sideBar: JsonObject {
                 property bool closeWhenClicked: false
+            }
+
+            /// Slot único del preset "Custom" del ecualizador: las 10 ganancias
+            /// en dB (-12..12), en el mismo orden que EqualizerBackend.eqFrequencies.
+            /// Lo escribe el botón "Guardar" de la card del EQ, no se edita a mano.
+            property JsonObject equalizer: JsonObject {
+                property list<real> custom: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             }
         }
     }

@@ -50,9 +50,13 @@ WrapperMouseArea {
         }
     }
 
+    readonly property bool charging: bat.state === UPowerDeviceState.Charging
+                                  || bat.state === UPowerDeviceState.PendingCharge
+
     property var icons: [" ", " ", " ", " ", " "]
 
     property string icon: {
+        if (charging) return "󰂄 "
         let batP = Math.round(bat.percentage * 100)
         for (let i = 0; i < icons.length; i++) {
             let low  = (i / icons.length) * 100
@@ -72,7 +76,7 @@ WrapperMouseArea {
         return hours + "h " + minutes + "m";
     }
 
-    readonly property int detailLineCount: 4 + (bat.timeToEmpty ? 1 : 0) + (bat.timeToFull ? 1 : 0)
+    readonly property int detailLineCount: 5 + (bat.timeToEmpty ? 1 : 0) + (bat.timeToFull ? 1 : 0)
     readonly property int externalDeviceCount: {
         let n = 0
         const devices = UPower.devices.values ? UPower.devices.values : UPower.devices
@@ -135,6 +139,12 @@ WrapperMouseArea {
                     Text {
                         visible: bat.timeToFull
                         text: "Tiempo de carga: " + formatSeconds(bat.timeToFull)
+                        color: Colors.ensureReadable(Colors.palette[7], Colors.palette[3]); font.pixelSize: 12
+                    }
+
+                    Text {
+                        text: "Estado: " + (main.charging ? "Cargando"
+                            : bat.state === UPowerDeviceState.FullyCharged ? "Cargada" : "Descargando")
                         color: Colors.ensureReadable(Colors.palette[7], Colors.palette[3]); font.pixelSize: 12
                     }
 

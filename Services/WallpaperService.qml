@@ -647,8 +647,12 @@ QtObject {
         // costó varias iteraciones. `setsid --fork` garantiza que este Process
         // termine de inmediato mientras mpvpaper queda en su propia sesión —
         // imprescindible, si no muere con la primera recarga de config.
+        // `pkill && sleep`: pkill sale 0 solo si señaló a alguien, así que los
+        // 300ms de espera se pagan únicamente cuando hay un mpvpaper anterior
+        // soltando la capa `background`. Viniendo de un wallpaper estático —el
+        // caso normal— no hay a quién esperar y el arranque es inmediato.
         videoProc.command = ["setsid", "--fork", "sh", "-c",
-            'pkill -x "$1"; sleep 0.3; exec "$1" -f -p -a FULL -o "$2" ALL "$3"',
+            'pkill -x "$1" && sleep 0.3; exec "$1" -f -p -a FULL -o "$2" ALL "$3"',
             "_", Config.wallpaper.videoBackend, Config.wallpaper.videoOptions, path]
         videoProc.running = true
         videoSettleTimer.restart()

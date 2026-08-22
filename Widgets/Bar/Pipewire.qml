@@ -23,9 +23,11 @@ WrapperMouseArea {
     property bool showVolume: true
     property bool showPopup: false
     readonly property real volumeValue: sink ? sink.audio.volume : 0
+    readonly property bool muted: sink ? sink.audio.muted : false
     property var icons: ["", " ", "󰕾 ", " "]
 
     property string icon: {
+        if (muted) return "󰝟 "
         let vol = Math.round(volumeValue * 100)
         for (let i = 0; i < icons.length; i++) {
             let low  = (i / icons.length) * 100
@@ -50,7 +52,9 @@ WrapperMouseArea {
                 ? main.icon + "  " + Math.round(main.volumeValue * 100) + "%"
                 : main.icon + "  " + Math.round(main.volumeValue * 100) + "% - " + main.sink.description
         }
-        color: Colors.ensureReadable(Colors.palette[7], Colors.palette[4]) // fondo real: BarPill
+        color: main.muted
+            ? Colors.danger
+            : Colors.ensureReadable(Colors.palette[7], Colors.palette[4]) // fondo real: BarPill
     }
     HoverPopup {
         id: hoverPopup
@@ -90,7 +94,7 @@ WrapperMouseArea {
                 Text {
                     width: parent.width
                     visible: main.sink !== null
-                    text: "Volumen: " + Math.round(main.volumeValue * 100) + "%"
+                    text: "Volumen: " + Math.round(main.volumeValue * 100) + "%" + (main.muted ? " (silenciado)" : "")
                     color: Qt.alpha(Colors.ensureReadable(Colors.palette[7], Colors.palette[3]), 0.6)
                     font.pixelSize: 11
                 }
