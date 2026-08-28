@@ -46,6 +46,12 @@ ShellRoot {
         // el mismo label (statusText es solo del camino de contraseña).
         property string fpStatus: ""
         readonly property bool fpDone: fpTries >= 5
+        // Espera del proximo reintento. Crece solo ante fallos espurios (sensor ausente
+        // tras un resume), vuelve a 1 s en cuanto hay un rechazo real de dedo.
+        property int fpDelay: 1000
+        // Marca de tiempo del ultimo pamFp.start(), para distinguir un rechazo de dedo
+        // real de un fallo instantaneo del sensor. Ver el criterio en pamFp.onCompleted.
+        property double fpStartedAt: 0
         // WlSessionLockSurface se instancia por monitor, asi que el scope raiz no alcanza los
         // ids de su interior: los flashes del indicador viajan por signal.
         signal fpFail()
@@ -84,12 +90,45 @@ ShellRoot {
     }
 
     // Reintento del contexto de huella, separado del de contraseña.
-    // ponytail: tope de 5 intentos con 1 s de espera para no spamear si pam_fprintd falla al
-    // instante (p. ej. sensor suspendido tras un resume). Ajustar segun el lector real.
+    // El tope de 5 intentos solo lo consumen rechazos de dedo reales; los fallos
+    // instantaneos (sensor ausente) espacian el reintento en vez de gastar presupuesto,
+    // que es lo unico que el tope protegia. Ver pamFp.onCompleted.
     Timer {
         id: fpTimer
-        interval: 1000
-        onTriggered: if (!pamFp.active && lockUI.fpTries < 5) pamFp.start()
+        interval: lockUI.fpDelay
+        onTriggered: {
+            if (lockUI.fpDone) return;
+            // Contexto ocupado: reencolar en vez de rendirse. Rendirse aqui dejaba el
+            // sensor apagado si el contexto quedaba colgado (un abort tras un resume no
+            // garantiza emitir completed, y ese completed era el unico que reencolaba).
+            if (pamFp.active) { fpTimer.restart(); return; }
+            lockUI.fpStartedAt = Date.now();
+            pamFp.start();
+        }
+    }
+
+    // Deteccion de resume por salto de reloj: el proceso queda congelado mientras el
+    // equipo duerme, asi que un tick que llega mas de 5 s tarde significa que volvimos
+    // de suspender. En ese punto el contexto de huella en vuelo apunta a un device de
+    // fprintd que se re-enumero, asi que se aborta y se rearma de cero. Sin esto el
+    // sensor quedaba apagado tras cada suspension y habia que tocar el badge a mano.
+    Timer {
+        id: resumeWatch
+        interval: 2000
+        repeat: true
+        running: true
+        property double last: Date.now()
+        onTriggered: {
+            const now = Date.now();
+            const jumped = now - last > 5000;
+            last = now;
+            if (!jumped) return;
+            lockUI.fpTries = 0;
+            lockUI.fpDelay = 1000;
+            lockUI.fpStatus = "";
+            if (pamFp.active) pamFp.abort();
+            fpTimer.restart();
+        }
     }
 
     // Autotermina el proceso tras liberar el lock. Quickshell 0.3.0 no expone quit/exit y
@@ -154,9 +193,21 @@ ShellRoot {
                 root.releaseLock();
                 return;
             }
-            lockUI.fpTries++;
-            lockUI.fpStatus = lockUI.fpDone ? "" : "Fingerprint not recognized";
-            lockUI.fpFail();
+            // Fallo espurio: el sensor no esta (tipico tras un resume, el device de
+            // fprintd se re-enumera). No gasta presupuesto ni pinta rojo, solo espacia
+            // el reintento para no spamear a pam_fprintd.
+            // ponytail: 1200 ms como piso de un rechazo humano — no da tiempo material a
+            // apoyar el dedo. Bajarlo si el lector real rechaza legitimamente mas rapido.
+            const spurious = result !== PamResult.Failed
+                          || (Date.now() - lockUI.fpStartedAt) < 1200;
+            if (spurious) {
+                lockUI.fpDelay = Math.min(lockUI.fpDelay * 2, 8000);
+            } else {
+                lockUI.fpDelay = 1000;
+                lockUI.fpTries++;
+                lockUI.fpStatus = lockUI.fpDone ? "" : "Fingerprint not recognized";
+                lockUI.fpFail();
+            }
             fpTimer.start();
         }
     }
@@ -434,8 +485,9 @@ ShellRoot {
 
                         onRetryRequested: {
                             lockUI.fpTries = 0;
+                            lockUI.fpDelay = 1000;
                             lockUI.fpStatus = "";
-                            fpTimer.start();
+                            fpTimer.restart();
                         }
 
                         Connections {

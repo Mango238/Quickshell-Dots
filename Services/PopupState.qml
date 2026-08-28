@@ -18,6 +18,11 @@ QtObject {
                    ? Hyprland.focusedMonitor.name : ""
     }
 
+    function close() {
+        active = ""
+        screenName = ""
+    }
+
     function isOpen(name) {
         return active === name
     }

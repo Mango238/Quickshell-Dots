@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import qs.Commons
+import qs.Services
 
 // Editor de Config/config.json. Escribe SIEMPRE directo al singleton Config
 // (qs.Commons), que persiste cada cambio vía JsonAdapter — nunca a properties
@@ -308,6 +309,16 @@ Item {
                 label: "Cerrar al hacer clic fuera"
                 value: Config.sideBar.closeWhenClicked
                 onToggled: v => Config.sideBar.closeWhenClicked = v
+            }
+
+            SectionLabel { text: "Mouse virtual" }
+
+            // Único control que NO escribe a Config: es estado de sesión del
+            // daemon (ver Services/VirtualMouse.qml), no una preferencia.
+            ToggleRow {
+                label: "Control por gestos"
+                value: VirtualMouse.active
+                onToggled: v => VirtualMouse.active = v
             }
         }
     }

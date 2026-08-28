@@ -136,7 +136,9 @@ Item {
         border.width: Math.max(1, 2 * fp.sc)
 
         // El pop de rearmado va en un Scale aparte: animar `scale` chocaria con su Behavior.
-        scale: retryMouse.containsMouse ? 1.06 : 1.0
+        // El hundido de pulsado si va aqui: lo anima el mismo Behavior, y popAnim (en el
+        // Scale) hace de rebote al soltar.
+        scale: retryMouse.pressed ? 0.92 : (retryMouse.containsMouse ? 1.06 : 1.0)
         transform: [
             Translate { id: shake },
             Scale { id: pop; origin.x: badge.width / 2; origin.y: badge.height / 2 }
@@ -158,11 +160,12 @@ Item {
             Behavior on color { ColorAnimation { duration: Config.anim.panel } }
         }
 
+        // Siempre pulsable, no solo con los intentos agotados: es el "rearmar ahora"
+        // manual, la salida rapida si el sensor se queda mudo.
         MouseArea {
             id: retryMouse
             anchors.fill: parent
             hoverEnabled: true
-            enabled: fp.exhausted
             onClicked: {
                 fp.retryRequested();
                 popAnim.restart();
@@ -170,7 +173,7 @@ Item {
         }
 
         Accessible.role: Accessible.Button
-        Accessible.name: fp.exhausted ? "Retry fingerprint" : "Fingerprint reader"
+        Accessible.name: "Retry fingerprint"
         Accessible.description: label.text
     }
 
