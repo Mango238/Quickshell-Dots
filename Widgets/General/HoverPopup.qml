@@ -34,6 +34,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
+import qs.Services
 
 Item {
     id: hoverPopup
@@ -60,6 +61,12 @@ Item {
 
     /// Abre/cierra el popup. La escribe el dueño; ver el ejemplo de arriba.
     property bool show: false
+
+    // Muesca de la barra centrada sobre el popup
+    onShowChanged: {
+        if (show) PopupState.setNotch(hoverPopup, triggerItem, offsetX + popupWidth / 2)
+        else PopupState.clearNotch(hoverPopup)
+    }
 
     // ─── Ventana popup ───────────────────────────────────────────────────────
 

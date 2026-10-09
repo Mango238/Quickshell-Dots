@@ -1,0 +1,4 @@
+# Dependencias directas del daemon. Todo lo demás (opencv-contrib-python, numpy, absl-py,
+# matplotlib, sounddevice...) lo arrastra mediapipe. Instalar con ./setup.sh (Python 3.15).
+mediapipe==1.1.0
+evdev==2.0.0

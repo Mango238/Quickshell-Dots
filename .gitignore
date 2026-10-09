@@ -23,3 +23,13 @@ Workspace
 Comparativa
 
 eq/parametric-eq.txt
+
+# bytecode de Python (daemon de Services/virtual_mouse)
+__pycache__/
+
+# venv (~500 MB, se recrea con Services/virtual_mouse/setup.sh) y modelo descargado
+Services/virtual_mouse/venv*/
+Services/virtual_mouse/*.task
+
+# benchmark de CPU local (ver ~/.cache/virtual_mouse_bench/)
+Services/virtual_mouse/bench.sh

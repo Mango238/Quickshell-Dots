@@ -50,6 +50,12 @@ ShapePath {
     property int bottomRightCornerState: 0
     property int bottomLeftCornerState:  0
 
+    // ── Lengüeta superior (rellena la muesca de la barra) ─────────────────────
+    // Centro en coords de la Shape; depth 0 = borde superior recto.
+    property real notchCenter:    panelX + panelWidth / 2
+    property real notchHalfWidth: 0
+    property real notchDepth:     0
+
     // ── ShapeCornerHelper (inlined) ───────────────────────────────────────────
 
     /**
@@ -153,11 +159,20 @@ ShapePath {
 
     // ── Path ─────────────────────────────────────────────────────────────────
 
-    // Top edge → right
-    PathLine {
-        relativeX: root.panelWidth - root.tlRadius * root.tlMultX - root.trRadius * root.trMultX
-        relativeY: 0
+    // Top edge → right, con la lengüeta (misma curva que la muesca de
+    // Modules/Bar.qml, invertida, para que encajen sin costura)
+    PathLine { x: root.notchCenter - root.notchHalfWidth; y: root.panelY }
+    PathCubic {
+        x: root.notchCenter; y: root.panelY - root.notchDepth
+        control1X: root.notchCenter - root.notchHalfWidth * 4.25 / 7; control1Y: root.panelY
+        control2X: root.notchCenter - root.notchHalfWidth * 2 / 7;    control2Y: root.panelY - root.notchDepth
     }
+    PathCubic {
+        x: root.notchCenter + root.notchHalfWidth; y: root.panelY
+        control1X: root.notchCenter + root.notchHalfWidth * 2 / 7;    control1Y: root.panelY - root.notchDepth
+        control2X: root.notchCenter + root.notchHalfWidth * 4.25 / 7; control2Y: root.panelY
+    }
+    PathLine { x: root.panelX + root.panelWidth - root.trRadius * root.trMultX; y: root.panelY }
 
     // Top-right corner
     PathArc {

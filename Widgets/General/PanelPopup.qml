@@ -3,6 +3,7 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import qs.Commons
+import qs.Services
 
 PopupWindow {
     id: panelPopup
@@ -142,7 +143,9 @@ PopupWindow {
         while (p.parent) p = p.parent
         var winHeight = p.height
         // Math.max: nunca <= 0, ni siquiera en el primer frame con medidas todavía en 0.
-        var h = Math.max(1, winHeight - pos.y)
+        // - notchDepth: el popup sube esos px sobre la barra para que su
+        // lengüeta rellene la muesca (el cuerpo sigue naciendo en el borde).
+        var h = Math.max(1, winHeight - pos.y - PopupState.notchDepth)
         _anchorRect = Qt.rect(offsetX, 0, alignItem.width, h)
     }
 
@@ -156,6 +159,9 @@ PopupWindow {
 
     onShowChanged: {
         if (show) _updateAnchorRect()
+        // Muesca de la barra centrada sobre el popup (centro del _anchorRect)
+        if (show) PopupState.setNotch(panelPopup, alignItem, alignItem.width / 2 + offsetX)
+        else PopupState.clearNotch(panelPopup)
         // Asignación imperativa a propósito: el setter C++ del grab escribe
         // active=false cuando el compositor lo limpia, lo que destruiría un
         // binding declarativo. Qt.callLater da un tick para que la ventana
@@ -173,7 +179,7 @@ PopupWindow {
     Component.onCompleted: Qt.callLater(_updateAnchorRect)
 
     implicitWidth: (panelWidth ? panelWidth : alignItem.width) + bg.overhangLeft + bg.overhangRight
-    implicitHeight: panelHeight
+    implicitHeight: panelHeight + PopupState.notchDepth
 
     visible: show || fadeAnim.running
     color: "transparent"
@@ -216,9 +222,11 @@ PopupWindow {
                 backgroundColor: panelPopup.solidColor
 
                 panelX: bg.overhangLeft
-                panelY: 0
+                panelY: PopupState.notchDepth
                 panelWidth: panelPopup.panelWidth ? panelPopup.panelWidth : panelPopup.alignItem.width
                 panelHeight: panelPopup.panelHeight
+                notchHalfWidth: PopupState.notchHalfWidth
+                notchDepth: PopupState.notchDepth
                 radius: panelPopup.panelRadius
                 tRadiusFactor: panelPopup.tRadiusFactor
                 topLeftCornerState: panelPopup.topLeftCornerState
@@ -231,6 +239,7 @@ PopupWindow {
         Item {
             id: contentSlot
             anchors.fill: parent
+            anchors.topMargin: PopupState.notchDepth
             anchors.leftMargin: bg.overhangLeft
             anchors.rightMargin: bg.overhangRight
         }

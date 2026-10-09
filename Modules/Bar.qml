@@ -1,6 +1,8 @@
 pragma ComponentBehavior: Bound
 import Quickshell // for PanelWindow
 import QtQuick // for Text
+import QtQuick.Shapes
+import QtQuick.Window
 import qs.Widgets.Bar
 import Quickshell.Wayland
 import qs.Services
@@ -40,22 +42,96 @@ Scope {
                 implicitHeight: 45
                 property int height: (root.implicitHeight / 2) + 5
 
-                Rectangle {
+                Item {
                     id: mainContainer
-                    // Extraer colores de Singleton
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: Qt.alpha(Colors.palette[0], 0.35) }
-                        GradientStop { position: 0.5; color: Qt.alpha(Colors.palette[5], 0.35) }
-                        GradientStop { position: 1.0; color: Qt.alpha(Colors.palette[0], 0.35) }
-
-                    }
-                    border.color: Qt.alpha(Colors.palette[7], 0.5)
                     anchors.left: parent.left
                     anchors.right: parent.right
-
                     height: root.implicitHeight
-                    radius: 30
+
+                    // Muesca sobre el popup abierto (solo en la barra de su monitor)
+                    readonly property real notchHalfWidth: PopupState.notchHalfWidth
+                    readonly property real notchDepth: PopupState.notchDepth
+                    readonly property bool notchOn: PopupState.notchItem !== null
+                        && PopupState.notchItem.Window.window === mainContainer.Window.window
+                    property real notchCenter: 0
+                    function updateNotch() {
+                        // Al cerrar no se actualiza: la muesca se aplana donde estaba
+                        if (notchOn) notchCenter = PopupState.notchItem.mapToItem(mainContainer, PopupState.notchX, 0).x
+                    }
+                    onNotchOnChanged: updateNotch()
+                    Connections {
+                        target: PopupState
+                        function onNotchItemChanged() { mainContainer.updateNotch() }
+                        function onNotchXChanged() { mainContainer.updateNotch() }
+                    }
+                    property real reveal: notchOn ? 1 : 0
+                    Behavior on reveal {
+                        NumberAnimation {
+                            duration: mainContainer.notchOn ? 160 : 120
+                            easing.type: mainContainer.notchOn ? Easing.OutCubic : Easing.InCubic
+                        }
+                    }
+
+                    // Píldora (radio = alto/2, inset 0.5px para que el trazo quede
+                    // dentro) con la muesca en el borde inferior
+                    Shape {
+                        id: barShape
+                        anchors.fill: parent
+                        preferredRendererType: Shape.CurveRenderer
+
+                        readonly property real r: (height - 1) / 2
+                        readonly property real hw: mainContainer.notchHalfWidth * mainContainer.reveal
+                        readonly property real depth: mainContainer.notchDepth * mainContainer.reveal
+                        readonly property real c: Math.max(r + hw, Math.min(width - r - hw, mainContainer.notchCenter))
+                        readonly property real yb: height - 0.5
+
+                        ShapePath {
+                            // Extraer colores de Singleton
+                            fillGradient: LinearGradient {
+                                x1: 0; y1: 0; x2: barShape.width; y2: 0
+                                GradientStop { position: 0.0; color: Qt.alpha(Colors.palette[0], 0.35) }
+                                GradientStop { position: 0.5; color: Qt.alpha(Colors.palette[5], 0.35) }
+                                GradientStop { position: 1.0; color: Qt.alpha(Colors.palette[0], 0.35) }
+                            }
+                            strokeColor: Qt.alpha(Colors.palette[7], 0.5)
+                            strokeWidth: 1
+
+                            startX: 0.5 + barShape.r; startY: 0.5
+                            PathLine { x: barShape.width - 0.5 - barShape.r; y: 0.5 }
+                            PathArc {
+                                x: barShape.width - 0.5 - barShape.r; y: barShape.yb
+                                radiusX: barShape.r; radiusY: barShape.r
+                                direction: PathArc.Clockwise
+                            }
+                            PathLine { x: barShape.c + barShape.hw; y: barShape.yb }
+                            PathCubic {
+                                x: barShape.c; y: barShape.yb - barShape.depth
+                                control1X: barShape.c + 4.25 * mainContainer.reveal; control1Y: barShape.yb
+                                control2X: barShape.c + 2 * mainContainer.reveal; control2Y: barShape.yb - barShape.depth
+                            }
+                            PathCubic {
+                                x: barShape.c - barShape.hw; y: barShape.yb
+                                control1X: barShape.c - 2 * mainContainer.reveal; control1Y: barShape.yb - barShape.depth
+                                control2X: barShape.c - 4.25 * mainContainer.reveal; control2Y: barShape.yb
+                            }
+                            PathLine { x: 0.5 + barShape.r; y: barShape.yb }
+                            PathArc {
+                                x: 0.5 + barShape.r; y: 0.5
+                                radiusX: barShape.r; radiusY: barShape.r
+                                direction: PathArc.Clockwise
+                            }
+                        }
+                    }
+
+                    // Animación en los huecos entre secciones (debajo de ellas)
+                    BarStream {
+                        anchors.fill: parent
+                        readonly property real pad: 10
+                        gaps: [
+                            { x1: leftside.x + leftside.width + pad, x2: midside.x - pad },
+                            { x1: midside.x + midside.width + pad, x2: rightside.x - pad }
+                        ]
+                    }
 
                     // Rectangulo izquierdo
                     LeftSide { id: leftside; radius: 10; barHeight: root.height }

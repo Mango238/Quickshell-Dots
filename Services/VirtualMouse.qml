@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Mouse virtual por gestos de mano: el daemon Python de ~/virtual_mouse
+// Mouse virtual por gestos de mano: el daemon Python de Services/virtual_mouse/
 // (MediaPipe + evdev/uinput) que antes prendía y apagaba un botón de eww.
 //
 // Singleton a propósito: la barra y el sidebar se instancian una vez POR
@@ -21,14 +21,14 @@ Singleton {
     // sería una sorpresa desagradable.
     property bool active: false
 
-    readonly property string _dir: Quickshell.env("HOME") + "/virtual_mouse"
+    readonly property string _dir: Quickshell.shellPath("Services/virtual_mouse")
 
     Process {
         running: root.active
 
         // El python del venv por ruta absoluta, no `source activate`: el
         // activate de ese venv tiene VIRTUAL_ENV apuntando a otra ruta y
-        // activaba un venv distinto (ver virtual_mouse_check.sh).
+        // activaba un venv distinto.
         command: [root._dir + "/venv/bin/python", root._dir + "/main.py"]
 
         // Cámara ocupada, venv roto, crash de MediaPipe: que el toggle vuelva
